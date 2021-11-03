@@ -1,30 +1,264 @@
 package com.ble.new_mattress
 
+import android.Manifest
+import android.bluetooth.*
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import java.io.File
+import java.lang.Exception
+import java.util.*
 import kotlin.system.exitProcess
+//////global variable
+var ble_cnt = false
+var bleaddress = ""
+val blefilename = "blemacaddress.txt"
+var blefile : File? = null
+var storagePath : File? = null
+var mgatt: BluetoothGatt? = null
+val ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED"
+lateinit var bluetoothManager : BluetoothManager
+lateinit var bluetoothAdapter : BluetoothAdapter
 
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+val bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().bluetoothLeScanner
+
+
+
+/////global variable
 class MainActivity : AppCompatActivity() {
-    var device_find = false
+    lateinit var ib_ble :ImageButton
+    var SavedBleAddr :String = ""
+    var FLAG_FOUNDDEVICE = false
+    var bthHandler2: Handler? = Handler()
+    private val gattCallback = object : BluetoothGattCallback() {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+        }
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            gatt.discoverServices()
+            if (gatt == null) {
+                Log.e("TAG", "mBluetoothGatt not created!");
+                return;
+            }
+
+            val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+
+            //String address = device.getAddress();
+            Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
+
+            try {
+                when (newState) {
+                    BluetoothProfile.STATE_DISCONNECTED -> {
+                        broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace();
+            }
+
+        }
+
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
+            super.onDescriptorRead(gatt, descriptor, status)
+
+        }
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+        }
+    }
+
+
+    private val leScanCallback4main = @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    object : ScanCallback() {
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+        override fun onScanResult(callbackType: Int, result: ScanResult?) {
+
+            if(result!!.device.address == SavedBleAddr && !FLAG_FOUNDDEVICE) {
+                FLAG_FOUNDDEVICE = true
+                mgatt = result!!.device.connectGatt(
+                    applicationContext,
+                    false,
+                    gattCallback
+                )
+            }///try to connect
+
+        }
+        override fun onScanFailed(errorCode: Int) {
+            Log.e("Scan Failed", "Error Code: $errorCode")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        findview()
 
+        storagePath = this.getExternalFilesDir(null)
+        blefile = File(storagePath, blefilename)
+
+        try{
+            bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            bluetoothAdapter = bluetoothManager?.adapter
+            if (!bluetoothAdapter?.isEnabled) {
+                val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                startActivityForResult(intent, 1)
+            }
+        }
+        catch(e :java.lang.Exception){
+            Log.e("bleAdapter",e.message!!)
+        }
+
+
+        try{
+            if(blefile!!.exists()){
+                SavedBleAddr = blefile!!.readText()
+                bluetoothLeScanner!!.startScan(leScanCallback4main)
+
+                bthHandler2?.postDelayed(Runnable {
+                    bluetoothLeScanner.stopScan(leScanCallback4main)
+                }, 4000)
+            }//////check the address could accessable or not
+            else{
+
+            }
+        }
+        catch(e :Exception){
+            Log.d("readble",e.message!!)
+        }
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            Log.e("Permission", "Request External Storage")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                9
+            )
+        }
+        else{
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    18
+                )
+            }
+            else{
+                    opentermsActivity()
+            }
+        }
+
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            1->{
+                if(resultCode == RESULT_OK){
+
+                }
+            }/////ble device
+            2->{
+
+
+            }/////bed adjust
+            8->{
+
+            }/////terms
+
+        }
+
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+
+            when(requestCode){
+                9->{
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                            18
+                        )
+                    }////ask fine location
+                    else{
+                        //opentermsActivity()
+                    }
+                }//////write external storage
+                18->{
+                    opentermsActivity()
+                }//////access fine location
+            }/////if granted
+        }
+        else{
+            Toast.makeText(this,"Can't get permission!!",Toast.LENGTH_SHORT)
+            moveTaskToBack(true);
+            exitProcess(-1)
+        }
+
+
+    }
+
+    fun opentermsActivity(){
         val intent2 = Intent(this, Terms::class.java)
         //intent.putExtra("mgatt", mgatt)
         startActivityForResult(intent2,8)
 
-        setContentView(R.layout.activity_main)
+
+
 
     }
 
+    private fun broadcastUpdate(action: String, address_connected: String, status: Int) {
+        val intent = Intent(action)
+        sendBroadcast(intent)
+    }
+
+
+    fun findview(){
+        ib_ble =findViewById(R.id.bt_ble)
+
+    }
+
+
+
     fun clickbluetooth(view: View) {
-
-
+        val intent = Intent(this, ble_device::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        //intent.putExtra("misc1", misc1)
+        startActivityForResult(intent, 1)
     }
     fun clickmenu(view: View) {
 
@@ -60,14 +294,10 @@ class MainActivity : AppCompatActivity() {
 
     }
     fun clickstart(view: View) {
-        if(device_find){
-            val intent = Intent(this, bed_adjust::class.java)
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.putExtra("device_find", device_find)
-            startActivityForResult(intent, 2)
-        }
-        else {
-            Toast.makeText(this,"請先連接藍芽裝置",Toast.LENGTH_SHORT)
-        }
+        val intent = Intent(this, bed_adjust::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityForResult(intent, 2)
+
+
     }
 }
