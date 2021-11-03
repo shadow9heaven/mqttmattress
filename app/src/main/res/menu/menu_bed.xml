@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.ble.mattress.MainActivity">
+    <item
+        android:id="@+id/credit"
+        android:orderInCategory="100"
+        android:title="credit"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/back"
+        android:orderInCategory="100"
+        android:title="back to title"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/exit"
+        android:orderInCategory="100"
+        android:title="exit"
+        app:showAsAction="never"
+        />
+
+</menu>
