@@ -28,20 +28,29 @@ import kotlin.system.exitProcess
 //////global variable
 var ble_cnt = false
 var bleaddress = ""
-val blefilename = "blemacaddress.txt"
+
 var blefile : File? = null
 var storagePath : File? = null
+val blefilename = "blemacaddress.txt"
+
 var mgatt: BluetoothGatt? = null
 val ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED"
 lateinit var bluetoothManager : BluetoothManager
 lateinit var bluetoothAdapter : BluetoothAdapter
 
+var Service_UART: BluetoothGattService? = null
+
+var CHARACTERISTIC_DATA: BluetoothGattCharacteristic? = null
+var CHARACTERISTIC_VER_MAC: BluetoothGattCharacteristic? = null
+var CHARACTERISTIC_INFO: BluetoothGattCharacteristic? = null
+var CHARACTERISTIC_COMMAND: BluetoothGattCharacteristic? = null
+
 ////////ble UUID
-private val SMARTMATTRESS_UUID = "670bef00-5278-1000-8034-12805f9b34fb"
-private val DATA_UUID =          "670bef01-5278-1000-8034-12805f9b34fb"
-private val VER_MAC_UUID =       "670bef02-5278-1000-8034-12805f9b34fb"
-private val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
-private val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
+val SMARTMATTRESS_UUID = "670bef00-5278-1000-8034-12805f9b34fb"
+val DATA_UUID =          "670bef01-5278-1000-8034-12805f9b34fb"
+val VER_MAC_UUID =       "670bef02-5278-1000-8034-12805f9b34fb"
+val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
+val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 ///////ble UUID
 
 
@@ -68,27 +77,33 @@ class MainActivity : AppCompatActivity() {
             super.onCharacteristicRead(gatt, characteristic, status)
         }
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            gatt.discoverServices()
-            if (gatt == null) {
-                Log.e("TAG", "mBluetoothGatt not created!");
-                return;
-            }
-
-            val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
-
-            //String address = device.getAddress();
-            Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
-
-            try {
-                when (newState) {
-                    BluetoothProfile.STATE_DISCONNECTED -> {
-                        broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
-                    }
+            if(newState == 2) {
+                gatt.discoverServices()
+                if (gatt == null) {
+                    Log.e("TAG", "mBluetoothGatt not created!");
+                    return;
                 }
-            } catch (e: Exception) {
-                e.printStackTrace();
-            }
 
+                val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+
+                //String address = device.getAddress();
+                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
+
+                try {
+                    when (newState) {
+                        BluetoothProfile.STATE_DISCONNECTED -> {
+                            broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace();
+                }
+            }
+            else if(newState == 0 || newState == 3){
+                var ble_cnt = false
+                var bleaddress = ""
+                ib_ble.setImageResource(R.drawable.bt_off)
+            }
         }
         override fun onDescriptorRead(
             gatt: BluetoothGatt?,
@@ -99,6 +114,37 @@ class MainActivity : AppCompatActivity() {
 
         }
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            Log.e("GATT", "onServicesDiscovered")
+
+            Service_UART = gatt!!.getService(UUID.fromString(SMARTMATTRESS_UUID))
+
+            // Get Characteristic
+            CHARACTERISTIC_DATA = Service_UART!!.getCharacteristic(UUID.fromString(DATA_UUID))
+            CHARACTERISTIC_VER_MAC  = Service_UART!!.getCharacteristic(UUID.fromString(VER_MAC_UUID))
+            CHARACTERISTIC_INFO = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
+            CHARACTERISTIC_COMMAND    = Service_UART!!.getCharacteristic(UUID.fromString(COMMAND_UUID))
+            Log.i("serviceDiscovered",  CHARACTERISTIC_COMMAND.toString())
+
+            // Enable Notify ECG
+
+            var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_DATA, true)
+            if(notify_success) Log.i("Biologue", "Enable notify 1")
+            else Log.e("Biologue", "Fail to enable notify 1")
+
+            for (dp in CHARACTERISTIC_DATA!!.getDescriptors()) {
+                Log.i("gattdevice-ecg", "dp:" + dp.toString())
+                if (dp != null) {
+                    if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                        dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    }
+                    else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                        dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                    }
+                    var tmp = gatt.writeDescriptor(dp)
+                }
+            }
+
+
         }
     }
 
