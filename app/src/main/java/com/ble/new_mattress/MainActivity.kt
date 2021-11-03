@@ -2,6 +2,7 @@ package com.ble.new_mattress
 
 import android.Manifest
 import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter.STATE_DISCONNECTED
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
@@ -11,6 +12,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -34,6 +36,17 @@ val ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTE
 lateinit var bluetoothManager : BluetoothManager
 lateinit var bluetoothAdapter : BluetoothAdapter
 
+////////ble UUID
+private val SMARTMATTRESS_UUID = "670bef00-5278-1000-8034-12805f9b34fb"
+private val DATA_UUID =          "670bef01-5278-1000-8034-12805f9b34fb"
+private val VER_MAC_UUID =       "670bef02-5278-1000-8034-12805f9b34fb"
+private val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
+private val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
+///////ble UUID
+
+
+//////global variable
+
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 val bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().bluetoothLeScanner
 
@@ -45,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     var SavedBleAddr :String = ""
     var FLAG_FOUNDDEVICE = false
     var bthHandler2: Handler? = Handler()
+
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
@@ -76,7 +90,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
         override fun onDescriptorRead(
             gatt: BluetoothGatt?,
             descriptor: BluetoothGattDescriptor?,
@@ -95,13 +108,26 @@ class MainActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
 
-            if(result!!.device.address == SavedBleAddr && !FLAG_FOUNDDEVICE) {
+            if(result!!.device.address == SavedBleAddr && !FLAG_FOUNDDEVICE && !ble_cnt) {
                 FLAG_FOUNDDEVICE = true
                 mgatt = result!!.device.connectGatt(
                     applicationContext,
                     false,
                     gattCallback
                 )
+                SystemClock.sleep(500)
+                if (bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != STATE_DISCONNECTED &&
+                    bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != BluetoothProfile.STATE_DISCONNECTING) {
+
+                    ble_cnt = true
+                    bleaddress = SavedBleAddr
+                    ib_ble.setImageResource(R.drawable.bt_on)
+
+
+                    FLAG_FOUNDDEVICE = false
+
+                }
+
             }///try to connect
 
         }
@@ -138,6 +164,7 @@ class MainActivity : AppCompatActivity() {
 
                 bthHandler2?.postDelayed(Runnable {
                     bluetoothLeScanner.stopScan(leScanCallback4main)
+                    FLAG_FOUNDDEVICE = false
                 }, 4000)
             }//////check the address could accessable or not
             else{
@@ -181,7 +208,7 @@ class MainActivity : AppCompatActivity() {
         when(requestCode){
             1->{
                 if(resultCode == RESULT_OK){
-
+                    ib_ble.setImageResource(R.drawable.bt_on)
                 }
             }/////ble device
             2->{
@@ -235,10 +262,6 @@ class MainActivity : AppCompatActivity() {
         val intent2 = Intent(this, Terms::class.java)
         //intent.putExtra("mgatt", mgatt)
         startActivityForResult(intent2,8)
-
-
-
-
     }
 
     private fun broadcastUpdate(action: String, address_connected: String, status: Int) {
@@ -248,8 +271,8 @@ class MainActivity : AppCompatActivity() {
 
 
     fun findview(){
-        ib_ble =findViewById(R.id.bt_ble)
 
+        ib_ble =findViewById(R.id.bt_ble)
     }
 
 

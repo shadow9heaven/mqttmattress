@@ -42,11 +42,7 @@ class bed_adjust : AppCompatActivity() {
     //private val UUID_CHAR_RESPONSE = "1234E103-FFFF-1234-FFFF-111122223333"
     //private val UUID_CHAR_HARDNESS = "1234E104-FFFF-1234-FFFF-111122223333"
 
-    private val SMARTMATTRESS_UUID = "670bef00-5278-1000-8034-12805f9b34fb"
-    private val DATA_UUID =          "670bef01-5278-1000-8034-12805f9b34fb"
-    private val VER_MAC_UUID =       "670bef02-5278-1000-8034-12805f9b34fb"
-    private val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
-    private val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
+
 
 
 
@@ -55,10 +51,8 @@ class bed_adjust : AppCompatActivity() {
     private lateinit var biologue_char_response: BluetoothGattCharacteristic
     private lateinit var biologue_char_hardness: BluetoothGattCharacteristic
 
-    private lateinit var bluetoothManager : BluetoothManager
-    private lateinit var bluetoothAdapter : BluetoothAdapter
 
-    var mgatt: BluetoothGatt? = null
+
 ////ble device
 /////////////command
 
