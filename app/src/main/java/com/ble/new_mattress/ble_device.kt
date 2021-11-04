@@ -267,7 +267,7 @@ class ble_device : AppCompatActivity() {
                     return;
                 }
 
-                val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+                bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                 //String address = device.getAddress();
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
@@ -282,6 +282,7 @@ class ble_device : AppCompatActivity() {
                     e.printStackTrace();
                 }
             }
+            
         }
 
         override fun onDescriptorRead(

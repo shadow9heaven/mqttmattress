@@ -2,8 +2,7 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/drawer_layout2"
-        android:layout_width="match_parent"
+    android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         android:fitsSystemWindows="true"
@@ -17,7 +16,6 @@
 
 
             <ImageView
-                android:id="@+id/imageView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:translationY="-10dp"
@@ -34,7 +32,6 @@
 
 
             <ImageView
-                android:id="@+id/imageView2"
                 android:layout_width="646dp"
                 android:layout_height="110dp"
 
@@ -118,7 +115,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.92" />
             <TextView
-                android:id="@+id/textleg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="leg"
@@ -356,7 +352,6 @@
                 app:layout_constraintVertical_bias="0.4" />
 
             <ImageButton
-                android:id = "@+id/bt_coherent1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:translationX="-150dp"
@@ -375,7 +370,6 @@
                 app:layout_constraintVertical_bias="0.2" />
 
             <ImageButton
-                android:id = "@+id/bt_cadence1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:translationX="-150dp"
@@ -393,7 +387,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.5" />
             <ImageButton
-                android:id = "@+id/bt_meditation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:translationX="-150dp"
@@ -412,7 +405,6 @@
 
 
             <ImageView
-                android:id="@+id/image_bedbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="clickbed"
@@ -427,7 +419,6 @@
                 app:srcCompat="@drawable/bed_all" />
 
             <ImageView
-                android:id="@+id/image_bed"
                 android:layout_width="18dp"
                 android:layout_height="13dp"
                 android:scaleX="2"
@@ -442,7 +433,6 @@
                 app:layout_constraintVertical_bias="0.92"
                 app:srcCompat="@drawable/small_lr" />
             <ImageView
-                android:id="@+id/imageView3"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:onClick="clickmenu"
@@ -458,44 +448,13 @@
 
                 />
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleX="0.5"
-                android:scaleY="0.5"
-                android:onClick="clickbluetooth"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.92"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.999"
-                app:srcCompat="@drawable/bt_on" />
+
 
             <ImageView
-                android:id="@+id/imageViewD"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:translationX="170dp"
-                android:scaleY="1.2"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0"
-                app:srcCompat="@drawable/drawer" />
-
-            <ImageView
-                android:id="@+id/imageView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/logo_small"            app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/logo_small"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.03"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -508,14 +467,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/through_view"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:background="@drawable/drawer"
-            android:fitsSystemWindows="true"
-            />
 
 
     </androidx.drawerlayout.widget.DrawerLayout>

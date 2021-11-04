@@ -16,7 +16,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
+
+@ExperimentalUnsignedTypes
 class bed_adjust : AppCompatActivity() {
+
+    lateinit var extFile: File
     var soundexist: Boolean = false
     lateinit var mediaPlayer: MediaPlayer
     lateinit var drawer: NavigationView
@@ -41,16 +45,6 @@ class bed_adjust : AppCompatActivity() {
     //private val UUID_CHAR_CONTROL  = "1234E102-FFFF-1234-FFFF-111122223333"
     //private val UUID_CHAR_RESPONSE = "1234E103-FFFF-1234-FFFF-111122223333"
     //private val UUID_CHAR_HARDNESS = "1234E104-FFFF-1234-FFFF-111122223333"
-
-
-
-
-
-    private lateinit var biologue_service: BluetoothGattService
-    private lateinit var biologue_char_control: BluetoothGattCharacteristic
-    private lateinit var biologue_char_response: BluetoothGattCharacteristic
-    private lateinit var biologue_char_hardness: BluetoothGattCharacteristic
-
 
 
 ////ble device
@@ -107,7 +101,6 @@ class bed_adjust : AppCompatActivity() {
 
 
 ////airbag connect
-    lateinit var ble_con : ImageButton
     lateinit var ib_cohe12 : ImageButton
     lateinit var ib_cohe37 : ImageButton
     lateinit var ib_cohe347 : ImageButton
@@ -191,15 +184,52 @@ class bed_adjust : AppCompatActivity() {
         else return (sec/60).toString()+":0"+ (sec%60).toString()
     }
 
+
     fun get_command(mod :String,body :Byte , bed : Int , p1 :Byte, p2 :Byte,
                     p3 :Byte, p4 :Byte, p5 :Byte, p6 :Byte, p7 :Byte):ByteArray{
-        return byteArrayOf(0xa2.toByte())
+        var tmp = header_len/////for output package
+        var cks = 0//////check sum
+
+
+
+
+
+
+        //Log.e(cks.toString() +"check sum:", c1.toString() +c2.toString() +c3.toString() +c4.toString() )
+        ///////checksum
+        return tmp
     }
+
 
     fun send_command(com :ByteArray) :Boolean{
-        return true
-    }
+        if (CHARACTERISTIC_COMMAND!= null) {
+            var ch_cmd = false
+            while(!ch_cmd) {
+                CHARACTERISTIC_COMMAND?.setValue(com)
+                ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
+                if (ch_cmd) {
+                    Log.e("sendcommand", "start_send")
+                    //PlotThread.start()
+                }
+                else {
+                    Log.e("sendcommand", "start_sendfailed!!")
+                    Thread.sleep(200)
+                }
+            }
+            val dff = SimpleDateFormat("HH-mm-ss")
+            dff.setTimeZone(TimeZone.getTimeZone("GMT+8:00"))
 
+            var oritext = dff.format(Date()) + ": "
+            for(r in com) oritext += r.toUByte().toString() + "_"
+            oritext += "\n"
+            extFile.appendText(oritext)
+            return true
+        }
+        else{
+            Log.e("sendcommand", "cmd is null")
+            return false
+        }
+    }
 
 
     fun set_347(progresa : Int){
@@ -764,6 +794,9 @@ class bed_adjust : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        extFile = File(storagePath, "$DATA_DIRECTORY/command.txt")
+
         findviewID1()
 
     }

@@ -37,6 +37,7 @@ var mgatt: BluetoothGatt? = null
 val ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED"
 lateinit var bluetoothManager : BluetoothManager
 lateinit var bluetoothAdapter : BluetoothAdapter
+lateinit var bluetoothDevice: BluetoothDevice
 
 var Service_UART: BluetoothGattService? = null
 
@@ -53,13 +54,10 @@ val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
 val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 ///////ble UUID
 
-
 //////global variable
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 val bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().bluetoothLeScanner
-
-
 
 /////global variable
 class MainActivity : AppCompatActivity() {
@@ -84,24 +82,15 @@ class MainActivity : AppCompatActivity() {
                     return;
                 }
 
-                val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+                //val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                 //String address = device.getAddress();
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
-
-                try {
-                    when (newState) {
-                        BluetoothProfile.STATE_DISCONNECTED -> {
-                            broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace();
-                }
             }
             else if(newState == 0 || newState == 3){
-                var ble_cnt = false
+                ble_cnt = false
                 var bleaddress = ""
+                broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
                 ib_ble.setImageResource(R.drawable.bt_off)
             }
         }

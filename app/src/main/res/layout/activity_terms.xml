@@ -12,14 +12,12 @@
         android:scrollbarStyle="insideOverlay" android:scrollbars="vertical"
         >
         <LinearLayout
-            android:id = "@+id/term_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
 
             >
             <TextView
-                android:id = "@+id/term_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -38,14 +36,12 @@
                 android:textSize="24dp"
                 />
             <LinearLayout
-                android:id = "@+id/term_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_gravity="center_horizontal"
                 >
                 <Button
-                    android:id="@+id/agree_button"
                     android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:text="agree"
@@ -53,7 +49,6 @@
                     android:onClick="clickagree"
                     />
                 <Button
-                    android:id="@+id/disagree_button"
                     android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:text="disagree"

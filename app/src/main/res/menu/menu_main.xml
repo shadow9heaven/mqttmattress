@@ -4,7 +4,6 @@
     tools:context="com.ble.mattress.MainActivity">
 
     <item
-        android:id="@+id/adv_mode"
         android:orderInCategory="100"
         android:title="advanced mode"
         app:showAsAction="never" />

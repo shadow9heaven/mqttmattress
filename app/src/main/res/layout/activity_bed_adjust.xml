@@ -2,7 +2,6 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
@@ -15,7 +14,6 @@
         android:layout_height="match_parent"
         tools:context=".bed_adjust">
         <ImageView
-            android:id="@+id/imageView5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:translationY="-13dp"
@@ -30,7 +28,6 @@
             app:layout_constraintVertical_bias="0"
             />
         <ImageView
-            android:id="@+id/imageView2"
             android:layout_width="646dp"
             android:layout_height="110dp"
 
@@ -116,7 +113,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.95" />
         <TextView
-            android:id="@+id/textleg"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -450,7 +446,6 @@
             app:layout_constraintVertical_bias="0.55" />
 
         <ImageView
-            android:id="@+id/image_bed"
             android:layout_width="18dp"
             android:layout_height="13dp"
             android:scaleX="2"
@@ -469,7 +464,6 @@
 
         <ImageView
 
-            android:id="@+id/imageView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clicklogo"
@@ -485,7 +479,6 @@
             app:layout_constraintVertical_bias="0.06" />
 
         <ImageView
-            android:id="@+id/image_bedbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clickbed"
@@ -501,7 +494,6 @@
             />
 
         <ImageButton
-            android:id = "@+id/bt_coherent1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:translationX="-150dp"
@@ -519,7 +511,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.2" />
         <ImageButton
-            android:id = "@+id/bt_cadence1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:translationX="-150dp"
@@ -537,7 +528,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5" />
         <ImageButton
-            android:id = "@+id/bt_meditation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:translationX="-150dp"
@@ -554,7 +544,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.8" />
         <ImageButton
-            android:id="@+id/imageView3"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:onClick="clickmenu"
