@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 2) {
-                gatt.discoverServices()
+                //gatt.discoverServices()
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                 ble_cnt = false
                 var bleaddress = ""
                 broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
-                ib_ble.setImageResource(R.drawable.bt_off)
+                runOnUiThread { ib_ble.setImageResource(R.drawable.bt_off) }
             }
         }
         override fun onDescriptorRead(
@@ -104,36 +104,6 @@ class MainActivity : AppCompatActivity() {
         }
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             Log.e("GATT", "onServicesDiscovered")
-
-            Service_UART = gatt!!.getService(UUID.fromString(SMARTMATTRESS_UUID))
-
-            // Get Characteristic
-            CHARACTERISTIC_DATA = Service_UART!!.getCharacteristic(UUID.fromString(DATA_UUID))
-            CHARACTERISTIC_VER_MAC  = Service_UART!!.getCharacteristic(UUID.fromString(VER_MAC_UUID))
-            CHARACTERISTIC_INFO = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
-            CHARACTERISTIC_COMMAND    = Service_UART!!.getCharacteristic(UUID.fromString(COMMAND_UUID))
-            Log.i("serviceDiscovered",  CHARACTERISTIC_COMMAND.toString())
-
-            // Enable Notify ECG
-
-            var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_DATA, true)
-            if(notify_success) Log.i("Biologue", "Enable notify 1")
-            else Log.e("Biologue", "Fail to enable notify 1")
-
-            for (dp in CHARACTERISTIC_DATA!!.getDescriptors()) {
-                Log.i("gattdevice-ecg", "dp:" + dp.toString())
-                if (dp != null) {
-                    if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
-                        dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    }
-                    else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
-                        dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    }
-                    var tmp = gatt.writeDescriptor(dp)
-                }
-            }
-
-
         }
     }
 
@@ -156,6 +126,7 @@ class MainActivity : AppCompatActivity() {
 
                     ble_cnt = true
                     bleaddress = SavedBleAddr
+                    bluetoothDevice = result!!.device
                     ib_ble.setImageResource(R.drawable.bt_on)
 
 

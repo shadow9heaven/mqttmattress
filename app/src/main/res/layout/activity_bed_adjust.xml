@@ -446,6 +446,7 @@
             app:layout_constraintVertical_bias="0.55" />
 
         <ImageView
+            android:id = "@+id/bed_icn"
             android:layout_width="18dp"
             android:layout_height="13dp"
             android:scaleX="2"
@@ -479,6 +480,7 @@
             app:layout_constraintVertical_bias="0.06" />
 
         <ImageView
+            android:id = "@+id/bed_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clickbed"
@@ -498,7 +500,6 @@
             android:layout_height="wrap_content"
             android:translationX="-150dp"
             android:background="@android:color/transparent"
-            android:onClick="clicktrans1"
 
             app:srcCompat="@drawable/coherent_m_button_on"
 

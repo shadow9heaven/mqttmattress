@@ -1,17 +1,28 @@
 package com.ble.new_mattress
 
+import MAVLink.MAVLinkPacket
+import MAVLink.Parser
+
+
+import MAVLink.bluetooth.msg_connect
+
+
 import android.bluetooth.*
 import android.content.Intent
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.drawerlayout.widget.DrawerLayout
+import com.ble.mqttexample.MqttClass
 import com.google.android.material.navigation.NavigationView
 import java.io.File
+import java.lang.Exception
+import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
@@ -19,6 +30,44 @@ import kotlin.system.exitProcess
 
 @ExperimentalUnsignedTypes
 class bed_adjust : AppCompatActivity() {
+    //////mavlink id
+    val CMD_BLUETOOTH_CONNECT = 34
+    val CMD_ADJUST_HARDNESS = 52
+    val CMD_RELIEVE_STRESS = 53
+    val CMD_MEDITATION = 54
+    val CMD_SMARTMATTRESS_CONNECT = 55
+
+    //////mavlink id
+    //////mavlink packet
+
+
+    //////mavlink packet
+
+    //////for mqtt protocol
+    var mqttclass : MqttClass? = MqttClass()
+
+    val serverURL = "tcp://114.34.221.116:6673"
+    val mqttuser  = "smartmattress"
+    val mqttpwd =   "aRkZQwD4"
+
+    val BA_wifissid = byteArrayOf()
+    val BA_wifipwd = byteArrayOf()
+
+    val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
+    val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
+    val BA_mqttpassword = mqttpwd.toByteArray(Charsets.US_ASCII)
+
+    val topic1 = "smttrss"
+
+    val topic2 = arrayOf("control","sensor","ack","err","config","model","ota","else")
+
+    var wifi_mac = "7C:DF:A1:C2:13:CA"
+
+//////for mqtt protocol
+/////FLAG
+    var FLAG_WAIT_ACK = false
+    var FLAG_DESCRIPTOR = false
+/////FLAG
 
     lateinit var extFile: File
     var soundexist: Boolean = false
@@ -38,43 +87,8 @@ class bed_adjust : AppCompatActivity() {
     lateinit var res_butt : TextView
 ////number textview
 
-////ble
-
-
-    //private val UUID_SERIVCE       = "1234E101-FFFF-1234-FFFF-111122223333"
-    //private val UUID_CHAR_CONTROL  = "1234E102-FFFF-1234-FFFF-111122223333"
-    //private val UUID_CHAR_RESPONSE = "1234E103-FFFF-1234-FFFF-111122223333"
-    //private val UUID_CHAR_HARDNESS = "1234E104-FFFF-1234-FFFF-111122223333"
-
-
-////ble device
 /////////////command
 
-    val tst_res = byteArrayOf(0x55.toByte(), 0x0F.toByte(), 0x01.toByte(), 0x10.toByte(), 0x03.toByte(), 0x00.toByte(),
-        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(),
-        0x00.toByte(), 0xE3.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-    val reset_cntl = byteArrayOf(0x55.toByte(),0x0f.toByte(),0x01.toByte(),0x10.toByte(),0x7F.toByte(),0x00.toByte()
-        ,0x00.toByte(),0x00.toByte(),0x00.toByte(),0x00.toByte(),0x00.toByte(),0x00.toByte()
-        ,0x00.toByte(),0xf4.toByte(),0x00.toByte(),0x00.toByte(),0x00.toByte())
-
-    val show_cntl = byteArrayOf(0x55.toByte(),0x0f.toByte(),0x01.toByte(),0x10.toByte(),0x7F.toByte(),0x00.toByte()
-        ,0xff.toByte(),0xff.toByte(),0xff.toByte(),0xff.toByte(),0xff.toByte(),0xff.toByte()
-        ,0xff.toByte(),0xED.toByte(),0x07.toByte(),0x00.toByte(),0x00.toByte())
-
-    val header_len = byteArrayOf(0x55.toByte(),0x0f.toByte())/////header and len
-    //////part
-
-    val cntl_head = 0x01.toByte()
-    val cntl_neck = 0x02.toByte()
-    val cntl_shoulder = 0x04.toByte()
-
-    val cntl_back = 0x08.toByte()
-    val cntl_weist = 0x10.toByte()
-    val cntl_butt = 0x20.toByte()
-    val cntl_medi = 0x40.toByte()
-
-//////part
 /////////left or right
 
     var bed_lrb :Int = 0
@@ -101,16 +115,10 @@ class bed_adjust : AppCompatActivity() {
 
 
 ////airbag connect
-    lateinit var ib_cohe12 : ImageButton
-    lateinit var ib_cohe37 : ImageButton
-    lateinit var ib_cohe347 : ImageButton
-    lateinit var ib_cohe34567 : ImageButton
-
-
-    var airbag12:Boolean ? = false
-    var airbag347:Boolean ? = false
-    var airbag37:Boolean ? = true
-    var airbag34567:Boolean ? = false
+    //var airbag12:Boolean ? = false
+    //var airbag347:Boolean ? = false
+    //var airbag37:Boolean ? = true
+    //var airbag34567:Boolean ? = false
 
 ////airbag connect
 
@@ -175,10 +183,26 @@ class bed_adjust : AppCompatActivity() {
     var set_rleg = 16
 
 
-    fun create_saving_directory() {
-        var dataDir = File( storagePath , DATA_DIRECTORY)
-        if(dataDir.mkdirs()) Log.e("mkdir", dataDir.toString())
-    }
+////////runnable
+///////////handler function
+var uihandle = Handler()
+    private val uiRunnable: Runnable = object : Runnable {
+        override fun run(){
+            runOnUiThread {
+
+            }
+            uihandle.postDelayed(this, 1000)
+        }
+    }////uihandle?.postDelayed(uiRunnable, 0)///////run
+    //// uihandle.removeCallbacks(uiRunnable)///stop
+///////////handler function
+
+
+
+////////runnable
+
+
+
     fun change_time(sec:Int) : String{
         if(sec % 60 >9)return (sec/60).toString() +":"+ (sec % 60).toString()
         else return (sec/60).toString()+":0"+ (sec%60).toString()
@@ -187,13 +211,9 @@ class bed_adjust : AppCompatActivity() {
 
     fun get_command(mod :String,body :Byte , bed : Int , p1 :Byte, p2 :Byte,
                     p3 :Byte, p4 :Byte, p5 :Byte, p6 :Byte, p7 :Byte):ByteArray{
-        var tmp = header_len/////for output package
+        //var tmp = header_len/////for output package
+        var tmp = byteArrayOf()
         var cks = 0//////check sum
-
-
-
-
-
 
         //Log.e(cks.toString() +"check sum:", c1.toString() +c2.toString() +c3.toString() +c4.toString() )
         ///////checksum
@@ -201,34 +221,47 @@ class bed_adjust : AppCompatActivity() {
     }
 
 
-    fun send_command(com :ByteArray) :Boolean{
-        if (CHARACTERISTIC_COMMAND!= null) {
-            var ch_cmd = false
-            while(!ch_cmd) {
-                CHARACTERISTIC_COMMAND?.setValue(com)
-                ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
-                if (ch_cmd) {
-                    Log.e("sendcommand", "start_send")
-                    //PlotThread.start()
-                }
-                else {
-                    Log.e("sendcommand", "start_sendfailed!!")
-                    Thread.sleep(200)
+    fun send_commandbyBle(com :ByteArray, msgid:Int) :Boolean{
+            //val mavparser = Parser().mavlink_parse_char(34)
+            var mavpac = MAVLinkPacket(com.size ,false)
+            //mavpac.payload.
+            when(msgid){
+                CMD_BLUETOOTH_CONNECT->{
+                    val cmdconstructor =  msg_connect(com[0].toShort(),0,0,false)
+                    mavpac = cmdconstructor.pack()
                 }
             }
-            val dff = SimpleDateFormat("HH-mm-ss")
-            dff.setTimeZone(TimeZone.getTimeZone("GMT+8:00"))
+            val output = mavpac.encodePacket()
 
-            var oritext = dff.format(Date()) + ": "
-            for(r in com) oritext += r.toUByte().toString() + "_"
-            oritext += "\n"
-            extFile.appendText(oritext)
-            return true
-        }
-        else{
-            Log.e("sendcommand", "cmd is null")
-            return false
-        }
+            Log.d("sendcommand mavlink",mavpac.toString())
+            if (CHARACTERISTIC_COMMAND!= null) {
+                var ch_cmd = false
+                while(!ch_cmd) {
+                    CHARACTERISTIC_COMMAND?.setValue(output)
+                    ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
+                    if (ch_cmd) {
+                        Log.e("sendcommand", "start_send")
+                        //PlotThread.start()
+                    }
+                    else {
+                        Log.e("sendcommand", "start_sendfailed!!")
+                        Thread.sleep(200)
+                    }
+                }
+                val dff = SimpleDateFormat("HH-mm-ss")
+                dff.setTimeZone(TimeZone.getTimeZone("GMT+8:00"))
+
+                var oritext = dff.format(Date()) + ": "
+                for(r in com) oritext += r.toUByte().toString() + "_"
+                oritext += "\n"
+                extFile.appendText(oritext)
+                return true
+            }
+            else{
+                Log.e("sendcommand", "cmd is null")
+                return false
+            }
+
     }
 
 
@@ -302,13 +335,15 @@ class bed_adjust : AppCompatActivity() {
         }
     }
 
+
+
     val l = object : View.OnTouchListener  {
         override fun onTouch(v:View, event: MotionEvent):Boolean{
             return true
         }
     }/////seekbar undraggable
 
-    val tune_head  = object : SeekBar.OnSeekBarChangeListener {
+    val tune_head     = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
 
         }
@@ -318,15 +353,15 @@ class bed_adjust : AppCompatActivity() {
                 var set = 0x01.toByte()
 
 
-                if(airbag12 == true)set = 0x03.toByte()
+                //if(airbag12 == true)set = 0x03.toByte()
 
                 var cmd = get_command("tune", set , bed_lrb , 0x01.toByte(), (current_head).toByte(),
                     0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
 
                 Log.e("command send",(current_head).toByte().toString())
 
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
+                //var res = send_command(cmd)
+                //Log.e("result:", res.toString())
                 //sleep(100)
 /*
     var pullstart = arrayListOf<Boolean>(false , false , false , false , false , false)
@@ -349,10 +384,9 @@ class bed_adjust : AppCompatActivity() {
             }///////send command
             else if(mode == "cade"&& ble_cnt){
                 if(cade_1==3 || cade_1 ==bed_lrb) {
-                    var cmd = get_command("cade", cntl_head, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(), cntl_head,(current_head*5).toByte() , 0x01.toByte(), 0x00.toByte())
+
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
             if(mode == "cohe"&&bed_lrb == 0){
@@ -360,11 +394,7 @@ class bed_adjust : AppCompatActivity() {
                 set_lhead = current_head
                 set_rhead = current_head
 
-                if (airbag12 == true) {
-                    //set_neck = current_head
-                    set_lneck = current_head
-                    set_rneck = current_head
-                }
+
             }
 
         }
@@ -375,7 +405,7 @@ class bed_adjust : AppCompatActivity() {
         }
     }////////head draggable
 
-    val tune_neck  = object : SeekBar.OnSeekBarChangeListener {
+    val tune_neck     = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
 
         }
@@ -385,14 +415,14 @@ class bed_adjust : AppCompatActivity() {
 
                 var set = 0x02.toByte()
 
-                if(airbag12 == true)set = 0x03.toByte()
+
 
                 var cmd = get_command("tune",set , bed_lrb , 0x02.toByte(), (current_neck).toByte(),
                     0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
 
                 Log.e("command send",cmd.toString())
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
+                //var res = send_command(cmd)
+               // Log.e("result:", res.toString())
 
                 //sleep(100)
 
@@ -409,21 +439,14 @@ class bed_adjust : AppCompatActivity() {
 //////////////////////pool count
 
 
-                if (airbag12 == true) {
-                    //  var cmd2 = get_command("tune",cntl_head , bed_lrb , 0x01.toByte(), (current_head/5).toByte(),
-                    //          0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-                    //  var res2 = send_command(cmd2)
-                    //  Log.e("result 2:", res2.toString())
-                    // sleep(100)
-                }
+
 
             }
             else if(mode == "cade"&& ble_cnt){
                 if(cade_2==3 || cade_2 ==bed_lrb) {
-                    var cmd = get_command("cade", cntl_neck, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(), cntl_neck, (current_neck * 5).toByte(), 0x01.toByte(), 0x00.toByte())
+
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
 
@@ -432,11 +455,11 @@ class bed_adjust : AppCompatActivity() {
                 set_lneck = current_neck
                 set_rneck = current_neck
 
-                if (airbag12 == true) {
+
                     //set_head = current_head
                     set_lhead = current_head
                     set_rhead = current_head
-                }
+
             }
         }
 
@@ -445,12 +468,6 @@ class bed_adjust : AppCompatActivity() {
             current_neck = progress /5
             //set_neck = current_neck
             num_neck.text = "$current_neck"
-
-            if(airbag12 == true) {
-                current_head = progress /5
-                sb_head?.setProgress(progress)
-                num_head.text = "$current_head"
-            }
 
             //}
         }
@@ -462,17 +479,11 @@ class bed_adjust : AppCompatActivity() {
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
             if(mode == "cohe"&& ble_cnt) {
-                var set = cntl_shoulder///////37
 
-                if(airbag347!!)set = 0x0C.toByte()/////347
-                else if(airbag34567!!) set  = 0x3C.toByte()///////////34567
 
-                var cmd = get_command("tune",set , bed_lrb , 0x03.toByte(), (current_shoulder).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",cmd.toString())
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
+                //Log.e("command send",cmd.toString())
+                //var res = send_command(cmd)
+                //Log.e("result:", res.toString())
                 //sleep(100)
 
 //////////////////////pool count
@@ -490,10 +501,9 @@ class bed_adjust : AppCompatActivity() {
             }//////send command
             else if(mode == "cade"&& ble_cnt){
                 if(cade_3==3 || cade_3 ==bed_lrb) {
-                    var cmd = get_command("cade", cntl_shoulder, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(), cntl_shoulder, (current_shoulder * 5).toByte(), 0x01.toByte(), 0x00.toByte())
+
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
 
@@ -501,32 +511,15 @@ class bed_adjust : AppCompatActivity() {
                 // set_shoulder = current_shoulder
                 set_lshoulder = current_shoulder
                 set_rshoulder = current_shoulder
-                // set_leg = current_leg
                 set_lleg = current_leg
                 set_rleg = current_leg
-                if(airbag347!!){
-                    set_lback = current_back
-                    set_rback = current_back
-                }
-                else if(airbag34567!!){
-                    set_lback = current_back
-                    set_rback = current_back
-                    set_lweist = current_weist
-                    set_rweist = current_weist
-                    set_lbutt = current_butt
-                    set_rbutt = current_butt
-
-                }
 
             }
 
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            //if(mode == "cohe") {
 
-
-            if (airbag37!!) {
                 current_shoulder = progress /5
                 current_leg = current_shoulder
                 sb_shoulder?.setProgress(progress)
@@ -534,36 +527,20 @@ class bed_adjust : AppCompatActivity() {
                 num_shoulder.text = "$current_shoulder"
                 num_leg.text = "$current_leg"
 
-            }
-            else if (airbag347!!) set_347(progress)
-            else if (airbag34567!!) set_34567(progress)
-            else{
-                current_shoulder = progress /5
-                num_shoulder.text = "$current_shoulder"
-            }
-
-
         }
-        //}
     }//////shoulder draggable
 
-    val tune_back = object : SeekBar.OnSeekBarChangeListener{
+    val tune_back     = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
             if(mode == "cohe" && ble_cnt) {
-                var set = cntl_back/////37 or 347
 
-                if(airbag347!!)set = 0x0C.toByte()/////347
-                else if(airbag34567!!) set  = 0x3C.toByte()///////////34567
 
-                var cmd = get_command("tune",  set , bed_lrb , 0x04.toByte(), (current_back).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",cmd.toString())
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
+                //Log.e("command send",cmd.toString())
+                //var res = send_command(cmd)
+                //Log.e("result:", res.toString())
 
 //////////////////////pool count
                 if(!pullstart[3]){
@@ -581,10 +558,9 @@ class bed_adjust : AppCompatActivity() {
             }
             else if(mode == "cade"&& ble_cnt){
                 if(cade_4==3 || cade_4 ==bed_lrb) {
-                    var cmd = get_command("cade", cntl_back, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(), cntl_back, (current_back * 5).toByte(), 0x01.toByte(), 0x00.toByte())
+
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
 
@@ -595,35 +571,22 @@ class bed_adjust : AppCompatActivity() {
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            //if(mode == "cohe" ) {
 
-            if(airbag347!!)set_347(progress)
-            else if(airbag34567!!)set_34567(progress)
-            else{
                 current_back = progress /5
                 num_back.text = "$current_back"
 
-            }
-            //}
+
         }
     }//////back draggable
 
-    val tune_weist = object : SeekBar.OnSeekBarChangeListener{
+    val tune_weist    = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?){
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?){
             if(mode == "cohe" && ble_cnt){
-                var set = cntl_weist ////////37 or 347
 
-                if(airbag34567!!) set  = 0x3C.toByte()///////////34567
 
-                var cmd = get_command("tune",set , bed_lrb , 0x05.toByte(), (current_weist).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",cmd.toString())
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
 
 //////////////////////pool count
                 if(!pullstart[4]){
@@ -637,16 +600,13 @@ class bed_adjust : AppCompatActivity() {
                 }
 //////////////////////pool count
 
-
-
                 //sleep(100)
             }
             else if(mode == "cade"&& ble_cnt){
                 if(cade_5==3 || cade_5 ==bed_lrb) {
-                    var cmd = get_command("cade", cntl_weist, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(), cntl_weist , (current_weist * 5).toByte(), 0x01.toByte(), 0x00.toByte())
+
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
 
@@ -658,31 +618,23 @@ class bed_adjust : AppCompatActivity() {
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            if(airbag34567!!)set_34567(progress)
-            else{
+
                 current_weist = progress /5
                 num_weist.text = "$current_weist"
 
-            }
         }
     }///////weist draggable
 
-    val tune_butt = object : SeekBar.OnSeekBarChangeListener{
+    val tune_butt     = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
             if(mode == "cohe" && ble_cnt) {
-                var set = cntl_butt
 
-                if(airbag34567!!)set = 0x3C.toByte()//////34567
-
-                var cmd = get_command("tune", set , bed_lrb , 0x06.toByte(), (current_butt).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",cmd.toString())
-                var res = send_command(cmd)
-                Log.e("result:", res.toString())
+                //Log.e("command send",cmd.toString())
+                //var res = send_command(cmd)
+                //Log.e("result:", res.toString())
 
 
 //////////////////////pool count
@@ -703,10 +655,8 @@ class bed_adjust : AppCompatActivity() {
 
             else if(mode == "cade"&& ble_cnt ){
                 if(cade_6==3 || cade_6 ==bed_lrb){
-                    var cmd = get_command("cade", cntl_butt, bed_lrb, 0x00.toByte(), 0x00.toByte(),
-                        0x00.toByte(),cntl_butt, (current_butt * 5).toByte(), 0x01.toByte(), 0x00.toByte())
                     //Log.e("command send",(current_head).toByte().toString())
-                    var res = send_command(cmd)
+                    //var res = send_command(cmd)
                 }
             }///////cade send command
 
@@ -719,17 +669,12 @@ class bed_adjust : AppCompatActivity() {
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
 
-            if(airbag34567!!)set_34567(progress)
-            else{
                 current_butt = progress /5
                 num_butt.text = "$current_butt"
-
-            }
 
         }
 
     }///////butt draggable
-
 
     fun findviewID1(){
         //////////////////////findviewbyid
@@ -784,24 +729,191 @@ class bed_adjust : AppCompatActivity() {
         sb_weist?.setOnSeekBarChangeListener(tune_weist)
         sb_butt?.setOnSeekBarChangeListener(tune_butt)
         sb_leg?.setOnSeekBarChangeListener(tune_shoulder)
+
+        bed_btn = findViewById(R.id.bed_btn)
+        bed_icn = findViewById(R.id.bed_icn)
+
     }/////for bed adjust
     fun findviewID2(){
         setContentView(R.layout.activity_bed_cadence)
+
+        bed_btn = findViewById(R.id.bed_btn)
+        bed_icn = findViewById(R.id.bed_icn)
+
     }/////for bed cadence
     fun findviewID3(){
         setContentView(R.layout.activity_bed_meditation)
+
     }/////for bed meditation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        extFile = File(storagePath, "$DATA_DIRECTORY/command.txt")
-
+        extFile = File(storagePath, "command.txt")
         findviewID1()
+        if(ble_cnt){
+            mgatt = bluetoothDevice.connectGatt(
+                applicationContext,
+                false,
+                gattCallback
+            )
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        uihandle.removeCallbacks(uiRunnable)
 
     }
 
+    private val gattCallback = object : BluetoothGattCallback() {
 
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
+
+        }
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            Log.e("onCharacteristicWrite",status.toString() +" :"+characteristic!!.uuid.toString())
+
+        }
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ){
+            val data = characteristic!!.value
+            Log.e("onCharacteristicChanged",characteristic.uuid.toString())
+
+            when(characteristic.uuid){
+                UUID.fromString(VER_MAC_UUID)->{
+                    var wifi_ByteArray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
+                    Log.d("onVerMac",wifi_ByteArray.toString())
+                    //wifi_mac =
+
+                }/////get version and mac
+                UUID.fromString(INFO_UUID)->{
+
+                }/////get info
+
+            }
+
+        }
+
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            if(newState == 2) {
+                gatt.discoverServices()
+                if (gatt == null) {
+                    Log.e("TAG", "mBluetoothGatt not created!");
+                    return;
+                }
+                //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+
+                //String address = device.getAddress();
+                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
+            }
+            else if(newState ==0 || newState == 3){
+                broadcastUpdate(ACTION_GATT_DISCONNECTED)
+                ble_cnt = false
+            }
+        }
+
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
+            super.onDescriptorRead(gatt, descriptor, status)
+            Log.e("DR", gatt.toString())
+            Log.e("DR", descriptor.toString())
+        }
+
+        override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+            super.onDescriptorWrite(gatt, descriptor, status)
+            Log.e("DW", gatt.toString())
+            Log.e("DW", descriptor.toString())
+            ////send connect both device
+            when(descriptor){
+                CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
+                    send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
+                }///////send get mac first
+                CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{
+                    for (dp in CHARACTERISTIC_INFO!!.getDescriptors()){
+                        Log.i("CHARACTERISTIC_INFO", "dp:" + dp.toString())
+                        if (dp != null) {
+                            if(CHARACTERISTIC_INFO!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                                dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                            else if (CHARACTERISTIC_INFO!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                                dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                            }
+                            var tmp = mgatt!!.writeDescriptor(dp)
+                            Log.e("response",tmp.toString())
+                        }
+                    }
+                }////////get info descriptor after ver mac
+                CHARACTERISTIC_INFO!!.getDescriptors().last()->{
+                    for (dp in CHARACTERISTIC_COMMAND!!.getDescriptors()) {
+                        Log.i("CHARACTERISTIC_COMMAND", "dp:" + dp.toString())
+                        if (dp != null) {
+                            if(CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                                dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                            else if (CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                                dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                            }
+                            var tmp = mgatt!!.writeDescriptor(dp)
+                            Log.e("response",tmp.toString())
+                        }
+                    }////command descriptors
+                }//////get commmand descriptor after info
+            }
+
+
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            Log.e("GATT", "onServicesDiscovered")
+
+            Service_UART = gatt!!.getService(UUID.fromString(SMARTMATTRESS_UUID))
+            // Get Characteristic
+            CHARACTERISTIC_DATA = Service_UART!!.getCharacteristic(UUID.fromString(DATA_UUID))
+            CHARACTERISTIC_VER_MAC  = Service_UART!!.getCharacteristic(UUID.fromString(VER_MAC_UUID))
+            CHARACTERISTIC_INFO = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
+            CHARACTERISTIC_COMMAND    = Service_UART!!.getCharacteristic(UUID.fromString(COMMAND_UUID))
+
+            // Enable Notify
+
+            var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_DATA, true)
+            if(notify_success) Log.i("cDATAnotify", "Enable notify 1")
+            else Log.e("cDATAnotify", "Fail to enable notify 1")
+
+
+            for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
+                Log.i("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
+                if (dp != null) {
+                    if(CHARACTERISTIC_VER_MAC!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                        dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    }
+                    else if (CHARACTERISTIC_VER_MAC!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                        dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                    }
+                    var tmp = mgatt!!.writeDescriptor(dp)
+                    Log.e("response",tmp.toString())
+                }
+            }
+
+
+        }
+    }
 
 
     fun clickmenu(view: View) {
@@ -878,9 +990,9 @@ class bed_adjust : AppCompatActivity() {
 
             bed_lrb = 1
 
-            ///cadence UI set
-            //set_UI(bed_lrb)
-            ///cadence UI set
+            ///UI set
+            set_bedUI()
+            ///UI set
 
 
         }//////change to left
@@ -910,27 +1022,15 @@ class bed_adjust : AppCompatActivity() {
             sb_butt?.setProgress(current_butt*5)
             sb_leg?.setProgress(current_leg*5)
 
-            if(airbag12!!){
-
-            }
-            if(airbag37!!){
-
-            }
-            else if(airbag347!!){
-
-            }
-            else if(airbag34567!!){
-
-            }
 
 
             bed_btn.setImageResource(R.drawable.bed_right)
             bed_icn.setImageResource(R.drawable.small_r)
             bed_lrb = 2
 
-            ///cadence UI set
-            //set_UI(bed_lrb)
-            ///cadence UI set
+            ///UI set
+            set_bedUI()
+            ///UI set
 
         }//////change to right
         else if(bed_lrb == 2){
@@ -971,6 +1071,13 @@ class bed_adjust : AppCompatActivity() {
         }///////change to both
     }////////click bed
 
+    private fun set_bedUI() {
+
+    }
+    private fun broadcastUpdate(action: String) {
+        val intent = Intent(action)
+        sendBroadcast(intent)
+    }
 
     fun clicktrans1(view: View) {
 

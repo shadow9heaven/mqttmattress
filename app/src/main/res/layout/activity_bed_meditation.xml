@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:translationX="-150dp"
             android:background="@android:color/transparent"
-            android:onClick="clicktrans2"
+            android:onClick="clicktrans1"
 
             app:srcCompat="@drawable/coherent_m_button_off"
 
@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:translationX="-150dp"
             android:background="@android:color/transparent"
-            android:onClick="clickmedi1"
             app:srcCompat="@drawable/meditation_m_button_on"
 
             app:layout_constraintBottom_toBottomOf="parent"

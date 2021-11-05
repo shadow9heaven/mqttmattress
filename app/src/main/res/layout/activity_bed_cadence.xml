@@ -356,7 +356,7 @@
                 android:layout_height="wrap_content"
                 android:translationX="-150dp"
                 android:background="@android:color/transparent"
-                android:onClick="clicktrans2"
+                android:onClick="clicktrans1"
 
                 app:srcCompat="@drawable/coherent_m_button_off"
 
@@ -374,7 +374,6 @@
                 android:layout_height="wrap_content"
                 android:translationX="-150dp"
                 android:background="@android:color/transparent"
-                android:onClick="clickcadence2"
 
                 app:srcCompat="@drawable/cadence_m_button_on"
 
@@ -405,6 +404,7 @@
 
 
             <ImageView
+                android:id = "@+id/bed_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="clickbed"
@@ -419,6 +419,7 @@
                 app:srcCompat="@drawable/bed_all" />
 
             <ImageView
+                android:id = "@+id/bed_icn"
                 android:layout_width="18dp"
                 android:layout_height="13dp"
                 android:scaleX="2"

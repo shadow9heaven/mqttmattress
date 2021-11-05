@@ -156,7 +156,7 @@ class ble_device : AppCompatActivity() {
         Log.e("GATT", bluetoothManager.getConnectedDevices(BluetoothProfile.GATT).toString())
         listView.setOnItemClickListener { parent, view, position, id ->
 
-            val clickHandler:Handler=Handler()
+            val clickHandler=Handler()
             val clickRunnable= Runnable {
                 device_connect=false
                 val devadd = BLE_nameList[position]["misc"]
@@ -168,6 +168,8 @@ class ble_device : AppCompatActivity() {
 
                             ble_cnt = true
                             bleaddress  = devadd
+                            bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+                            writeDevice2file(devadd)
 
                             setResult(RESULT_OK, getIntent())
                             finish()
@@ -195,6 +197,7 @@ class ble_device : AppCompatActivity() {
 
                                 ble_cnt = true
                                 bleaddress  = devadd
+                                bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                                 writeDevice2file(devadd)
 
@@ -260,14 +263,14 @@ class ble_device : AppCompatActivity() {
             super.onCharacteristicRead(gatt, characteristic, status)
         }
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if(newState == 2) {
-                gatt.discoverServices()
+            if(newState == 2|| newState == 3) {
+                //gatt.discoverServices()
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
                 }
 
-                bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
+
 
                 //String address = device.getAddress();
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
@@ -281,8 +284,8 @@ class ble_device : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace();
                 }
+
             }
-            
         }
 
         override fun onDescriptorRead(
@@ -411,9 +414,7 @@ class ble_device : AppCompatActivity() {
         try{
             disconnect(bleaddress)
         }catch (e: Exception){
-
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
