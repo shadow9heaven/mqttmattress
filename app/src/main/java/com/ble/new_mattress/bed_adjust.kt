@@ -209,36 +209,39 @@ var uihandle = Handler()
     }
 
 
+
     fun get_command(mod :String,body :Byte , bed : Int , p1 :Byte, p2 :Byte,
                     p3 :Byte, p4 :Byte, p5 :Byte, p6 :Byte, p7 :Byte):ByteArray{
         //var tmp = header_len/////for output package
         var tmp = byteArrayOf()
         var cks = 0//////check sum
-
         //Log.e(cks.toString() +"check sum:", c1.toString() +c2.toString() +c3.toString() +c4.toString() )
         ///////checksum
         return tmp
     }
 
-
     fun send_commandbyBle(com :ByteArray, msgid:Int) :Boolean{
             //val mavparser = Parser().mavlink_parse_char(34)
             var mavpac = MAVLinkPacket(com.size ,false)
             //mavpac.payload.
+
             when(msgid){
                 CMD_BLUETOOTH_CONNECT->{
                     val cmdconstructor =  msg_connect(com[0].toShort(),0,0,false)
                     mavpac = cmdconstructor.pack()
                 }
             }
+
             val output = mavpac.encodePacket()
 
             Log.d("sendcommand mavlink",mavpac.toString())
+
             if (CHARACTERISTIC_COMMAND!= null) {
                 var ch_cmd = false
                 while(!ch_cmd) {
                     CHARACTERISTIC_COMMAND?.setValue(output)
                     ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
+
                     if (ch_cmd) {
                         Log.e("sendcommand", "start_send")
                         //PlotThread.start()
@@ -746,6 +749,39 @@ var uihandle = Handler()
 
     }/////for bed meditation
 
+    fun byte2str(input:Int):String{
+        var strtmp = ""
+        val higherB = input / 16
+        val lowerB = input % 16
+
+        var higherC:Char = num2char(higherB)
+        var lowerC :Char = num2char(lowerB)
+
+        return strtmp.plus(higherC).plus(lowerC)
+    }
+    fun num2char(a :Int):Char{
+        when(a){
+            15->return 'F'
+            14->return 'E'
+            13->return 'D'
+            12->return 'C'
+            11->return 'B'
+            10->return 'A'
+            9-> return '9'
+            8-> return '8'
+            7-> return '7'
+            6-> return '6'
+            5-> return '5'
+            4-> return '4'
+            3-> return '3'
+            2-> return '2'
+            1-> return '1'
+            0-> return '0'
+        }
+        return '0'
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         extFile = File(storagePath, "command.txt")
@@ -774,6 +810,32 @@ var uihandle = Handler()
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
+
+
+            val data = characteristic!!.value
+            when(characteristic.uuid.toString()){
+                VER_MAC_UUID->{
+                    val ble_mac = byteArrayOf(data[4],data[5],data[6],data[7],data[8] ,data[9])
+                    val wifi_bytearray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
+
+                    var strtmp = ""
+                    for(i in wifi_bytearray){
+                        var j = i.toInt()
+                        if(j<0){
+                            j = j+256
+                        }
+                        strtmp += byte2str(j)
+                        strtmp += ":"
+                    }
+                    wifi_mac = strtmp.dropLast(1)
+                    Log.d("onVerMac",wifi_mac)
+                }/////get version and mac
+                INFO_UUID->{
+
+                    Log.d("onINFO",data[0].toString())
+                }/////get info
+
+            }
 
         }
         override fun onCharacteristicWrite(
@@ -843,7 +905,16 @@ var uihandle = Handler()
             ////send connect both device
             when(descriptor){
                 CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
-                    send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
+
+                    /////get mac and version first
+                    mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
+
+
+                    //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
+                    /////get mac and version first
+
+                    //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
+
                 }///////send get mac first
                 CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{
                     for (dp in CHARACTERISTIC_INFO!!.getDescriptors()){
@@ -896,15 +967,32 @@ var uihandle = Handler()
             if(notify_success) Log.i("cDATAnotify", "Enable notify 1")
             else Log.e("cDATAnotify", "Fail to enable notify 1")
 
+            var notify_success2 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
+            if(notify_success2) Log.i("cDATAnotify", "Enable notify 2")
+            else Log.e("cVERMACnotify", "Fail to enable notify 2")
+
+            var notify_success3 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_INFO, true)
+            if(notify_success3) Log.i("cDATAnotify", "Enable notify 3")
+            else Log.e("cINFOnotify", "Fail to enable notify 3")
+
+            var notify_success4 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_COMMAND, true)
+            if(notify_success4) Log.i("cDATAnotify", "Enable notify 4")
+            else Log.e("cCOMMANDnotify", "Fail to enable notify 4")
+
+
 
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
-                Log.i("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
+                Log.e("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
                 if (dp != null) {
                     if(CHARACTERISTIC_VER_MAC!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
                         dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        Log.e("VER_MAC-notify", "dp:" + dp.toString())
+
                     }
                     else if (CHARACTERISTIC_VER_MAC!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
                         dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        Log.e("VER_MAC-indicate", "dp:" + dp.toString())
+
                     }
                     var tmp = mgatt!!.writeDescriptor(dp)
                     Log.e("response",tmp.toString())

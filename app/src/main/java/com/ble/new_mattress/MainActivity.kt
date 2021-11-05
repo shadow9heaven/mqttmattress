@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             else if(newState == 0 || newState == 3){
                 ble_cnt = false
                 var bleaddress = ""
-                broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
+                broadcastUpdate(ACTION_GATT_DISCONNECTED);
                 runOnUiThread { ib_ble.setImageResource(R.drawable.bt_off) }
             }
         }
@@ -204,9 +204,11 @@ class MainActivity : AppCompatActivity() {
                     opentermsActivity()
             }
         }
+    }
 
-
-
+    override fun onDestroy() {
+        super.onDestroy()
+        broadcastUpdate(ACTION_GATT_DISCONNECTED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -270,7 +272,7 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent2,8)
     }
 
-    private fun broadcastUpdate(action: String, address_connected: String, status: Int) {
+    private fun broadcastUpdate(action: String) {
         val intent = Intent(action)
         sendBroadcast(intent)
     }
