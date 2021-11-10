@@ -54,6 +54,11 @@ val INFO_UUID =          "670bef03-5278-1000-8034-12805f9b34fb"
 val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 ///////ble UUID
 
+///////global flag
+var FLAG_WIFI_CONNECT = false
+
+///////global flag
+
 //////global variable
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

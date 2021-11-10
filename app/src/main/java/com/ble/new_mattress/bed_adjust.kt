@@ -1,11 +1,7 @@
 package com.ble.new_mattress
 
 import MAVLink.MAVLinkPacket
-import MAVLink.Parser
-
-
 import MAVLink.bluetooth.msg_connect
-
 
 import android.bluetooth.*
 import android.content.Intent
@@ -21,27 +17,41 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.ble.mqttexample.MqttClass
 import com.google.android.material.navigation.NavigationView
 import java.io.File
-import java.lang.Exception
-import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
+import MAVLink.mavlink_main.*
+import MAVLink.bootloader.*
+import MAVLink.smartmattress.*
+import MAVLink.logger.*
+import MAVLink.bluetooth.*
+import MAVLink.common.msg_radio_status
+import org.eclipse.paho.client.mqttv3.MqttMessage
 
 @ExperimentalUnsignedTypes
 class bed_adjust : AppCompatActivity() {
     //////mavlink id
-    val CMD_BLUETOOTH_CONNECT = 34
-    val CMD_ADJUST_HARDNESS = 52
-    val CMD_RELIEVE_STRESS = 53
-    val CMD_MEDITATION = 54
-    val CMD_SMARTMATTRESS_CONNECT = 55
-
+    val CMD_BL_COMMAND = msg_bl_command.MAVLINK_MSG_ID_BL_COMMAND                 ///2
+    val CMD_BL_OTA = msg_bl_ota.MAVLINK_MSG_ID_BL_OTA                             ///3
+    val CMD_BLUETOOTH_CONNECT = msg_connect.MAVLINK_MSG_ID_CONNECT                ///34
+    val CMD_ADJUST_HARDNESS = msg_adjust_hardness.MAVLINK_MSG_ID_ADJUST_HARDNESS  ///52
+    val CMD_RELIEVE_STRESS = msg_relieve_stress.MAVLINK_MSG_ID_RELIEVE_STRESS     ///53
+    val CMD_MEDITATION =  msg_meditation.MAVLINK_MSG_ID_MEDITATION                ///54
+    val CMD_SMARTMATTRESS_CONNECT = msg_connection.MAVLINK_MSG_ID_CONNECTION      ///55
+    val CMD_REQUEST_DATA = msg_request_data.MAVLINK_MSG_ID_REQUEST_DATA           ///59
+    val CMD_CONTROL_PUMP = msg_control_pump.MAVLINK_MSG_ID_CONTROL_PUMP           ///60
+    val CMD_CONTROL_STEP = msg_control_step.MAVLINK_MSG_ID_CONTROL_STEP           ///61
     //////mavlink id
-    //////mavlink packet
 
+/////position val
+    val pos_1 = 0x01.toByte()
+    val pos_2 = 0x02.toByte()
+    val pos_3 = 0x03.toByte()
+    val pos_4 = 0x04.toByte()
+    val pos_5 = 0x05.toByte()
+    val pos_6 = 0x06.toByte()
 
-    //////mavlink packet
 
     //////for mqtt protocol
     var mqttclass : MqttClass? = MqttClass()
@@ -50,8 +60,6 @@ class bed_adjust : AppCompatActivity() {
     val mqttuser  = "smartmattress"
     val mqttpwd =   "aRkZQwD4"
 
-    val BA_wifissid = byteArrayOf()
-    val BA_wifipwd = byteArrayOf()
 
     val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
     val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
@@ -61,22 +69,27 @@ class bed_adjust : AppCompatActivity() {
 
     val topic2 = arrayOf("control","sensor","ack","err","config","model","ota","else")
 
-    var wifi_mac = "7C:DF:A1:C2:13:CA"
+    //var wifi_mac = "7c:df:a1:c2:13:c8"
+
+    var wifi_mac = "7c:df:a1:c2:96:ac"
 
 //////for mqtt protocol
+
 /////FLAG
+
     var FLAG_WAIT_ACK = false
     var FLAG_DESCRIPTOR = false
 /////FLAG
 
     lateinit var extFile: File
     var soundexist: Boolean = false
+
     lateinit var mediaPlayer: MediaPlayer
     lateinit var drawer: NavigationView
     lateinit var dl_th : DrawerLayout
+
     var mode = "cohe"
     private val DATA_DIRECTORY = "LOG_DATA"
-
 
 ////number textview
     lateinit var res_head : TextView
@@ -91,19 +104,15 @@ class bed_adjust : AppCompatActivity() {
 
 /////////left or right
 
-    var bed_lrb :Int = 0
-    ////////////0:both, 1 left 2 right
+    var bed_lrb :Int = 2
+    //////////// 0 left 1 right 2 both
 
     lateinit var bed_btn :ImageView
     lateinit var bed_icn :ImageView
-
 /////////left or right
 
 
     ///////////mode button
-    lateinit var bt_cohe : ImageButton
-    lateinit var bt_cade : ImageButton
-    lateinit var bt_medi : ImageButton
 ///////////mode button
 
 /////cohe timer
@@ -115,21 +124,18 @@ class bed_adjust : AppCompatActivity() {
 
 
 ////airbag connect
-    //var airbag12:Boolean ? = false
-    //var airbag347:Boolean ? = false
-    //var airbag37:Boolean ? = true
-    //var airbag34567:Boolean ? = false
 
 ////airbag connect
 
-    //////cade on off
 
-    var cade_1 = 0
-    var cade_2 = 0
-    var cade_3 = 0
-    var cade_4 = 0
-    var cade_5 = 0
-    var cade_6 = 0
+
+//////cade on off
+    var cade_1 = 0.toShort()
+    var cade_2 = 0.toShort()
+    var cade_3 = 0.toShort()
+    var cade_4 = 0.toShort()
+    var cade_5 = 0.toShort()
+    var cade_6 = 0.toShort()
 
 //////cade on off
 
@@ -140,7 +146,6 @@ class bed_adjust : AppCompatActivity() {
     var sb_back: SeekBar? = null
     var sb_weist: SeekBar? = null
     var sb_butt: SeekBar? = null
-    var sb_leg: SeekBar? = null
 //////////////seek bar for draw
     lateinit var num_head : TextView
     lateinit var num_neck : TextView
@@ -148,7 +153,6 @@ class bed_adjust : AppCompatActivity() {
     lateinit var num_back : TextView
     lateinit var num_weist : TextView
     lateinit var num_butt : TextView
-    lateinit var num_leg : TextView
 
     var current_head = 16
     var current_neck = 16
@@ -156,7 +160,6 @@ class bed_adjust : AppCompatActivity() {
     var current_back = 16
     var current_weist = 16
     var current_butt = 16
-    var current_leg = 16
 
     var set_head = 16
     var set_neck = 16
@@ -164,7 +167,6 @@ class bed_adjust : AppCompatActivity() {
     var set_back = 16
     var set_weist = 16
     var set_butt = 16
-    var set_leg = 16
 
     var set_lhead = 16
     var set_lneck = 16
@@ -172,7 +174,7 @@ class bed_adjust : AppCompatActivity() {
     var set_lback = 16
     var set_lweist = 16
     var set_lbutt = 16
-    var set_lleg = 16
+
 
     var set_rhead = 16
     var set_rneck = 16
@@ -180,7 +182,7 @@ class bed_adjust : AppCompatActivity() {
     var set_rback = 16
     var set_rweist = 16
     var set_rbutt = 16
-    var set_rleg = 16
+
 
 
 ////////runnable
@@ -200,6 +202,106 @@ var uihandle = Handler()
 
 
 ////////runnable
+    /////mqtt function
+
+    fun mqttconnect() {
+        mqttclass!!.connect(this, serverURL, mqttuser, mqttpwd)
+    }
+
+    fun mqttpublish(com :ByteArray, msgid:Int) {
+
+        var publishmsg : MqttMessage?= MqttMessage()
+        var thistopic = ""
+        publishmsg!!.setId(msgid)
+        when(msgid){
+            CMD_BL_COMMAND->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_bl_command()
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }//////2
+            CMD_BL_OTA->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_bl_ota()
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }/////3
+            CMD_BLUETOOTH_CONNECT->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_connect(3)
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+
+            }/////34
+
+            ////for smart ress
+            CMD_ADJUST_HARDNESS->{
+
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val pos  = com[1].toShort()
+                val level = com[2].toShort()
+                val mavpac = msg_adjust_hardness(0x55,bed_lrb.toShort() , pos ,level)
+
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+
+            }/////52
+            CMD_RELIEVE_STRESS->{
+
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val pos = com[1].toShort()
+                val level = com[2].toShort()
+                val mavpac = msg_relieve_stress(0x55,bed_lrb.toShort(),pos,level)
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+
+            }/////53
+
+            CMD_MEDITATION->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val pos = com[1].toShort()
+                val level = com[2].toShort()
+                val mavpac = msg_meditation(0x55,bed_lrb.toShort(),pos,level)
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+
+            }/////54
+
+            CMD_SMARTMATTRESS_CONNECT->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_connection()
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }/////55
+
+            CMD_REQUEST_DATA->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_request_data(2)
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }/////59
+
+            CMD_CONTROL_PUMP->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val mavpac = msg_control_pump(1)
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }/////60
+
+            CMD_CONTROL_STEP->{
+                thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                val steps = com[0].toInt()
+                val id = com[1].toShort()
+                val mavpac = msg_control_step(steps,id)
+
+                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+            }////61
+
+        }
+
+
+        if (publishmsg != null) {
+            mqttclass!!.publish(thistopic, publishmsg , 1)
+        }
+    }
+    fun mqttsub(){
+        mqttclass!!.subscribe("#", 1)
+    }
+    fun mqttunsub(){
+        mqttclass!!.unsubscribe("#")
+    }
+    /////mqtt function
 
 
 
@@ -208,38 +310,24 @@ var uihandle = Handler()
         else return (sec/60).toString()+":0"+ (sec%60).toString()
     }
 
-
-
-    fun get_command(mod :String,body :Byte , bed : Int , p1 :Byte, p2 :Byte,
-                    p3 :Byte, p4 :Byte, p5 :Byte, p6 :Byte, p7 :Byte):ByteArray{
-        //var tmp = header_len/////for output package
-        var tmp = byteArrayOf()
-        var cks = 0//////check sum
-        //Log.e(cks.toString() +"check sum:", c1.toString() +c2.toString() +c3.toString() +c4.toString() )
-        ///////checksum
-        return tmp
-    }
-
     fun send_commandbyBle(com :ByteArray, msgid:Int) :Boolean{
             //val mavparser = Parser().mavlink_parse_char(34)
-            var mavpac = MAVLinkPacket(com.size ,false)
+            var mavpac = byteArrayOf()
             //mavpac.payload.
 
             when(msgid){
                 CMD_BLUETOOTH_CONNECT->{
                     val cmdconstructor =  msg_connect(com[0].toShort(),0,0,false)
-                    mavpac = cmdconstructor.pack()
+                    mavpac = cmdconstructor.pack().encodePacket()
                 }
+
             }
-
-            val output = mavpac.encodePacket()
-
             Log.d("sendcommand mavlink",mavpac.toString())
 
             if (CHARACTERISTIC_COMMAND!= null) {
                 var ch_cmd = false
                 while(!ch_cmd) {
-                    CHARACTERISTIC_COMMAND?.setValue(output)
+                    CHARACTERISTIC_COMMAND?.setValue(mavpac)
                     ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
 
                     if (ch_cmd) {
@@ -264,10 +352,9 @@ var uihandle = Handler()
                 Log.e("sendcommand", "cmd is null")
                 return false
             }
-
     }
 
-
+/*
     fun set_347(progresa : Int){
         var progress =  progresa /5
         if(current_shoulder != progress){
@@ -281,18 +368,12 @@ var uihandle = Handler()
             num_back.text = "$current_back"
         }
 
-        if(current_leg != progress){
-            current_leg = progress
-            sb_leg?.setProgress(progresa)
-            num_leg.text = "$current_leg"
-        }
         if(mode == "cohe"&&bed_lrb == 0){
             set_lshoulder = current_shoulder
             set_rshoulder = current_shoulder
             set_lback = current_back
             set_rback = current_back
-            set_lleg = current_leg
-            set_rleg = current_leg
+
         }
 
     }
@@ -319,11 +400,7 @@ var uihandle = Handler()
             sb_butt?.setProgress(progresa)
             num_butt.text = "$current_butt"
         }
-        if(current_leg != progress){
-            current_leg = progress
-            sb_leg?.setProgress(progresa)
-            num_leg.text = "$current_leg"
-        }
+
         if(mode == "cohe"&&bed_lrb == 0){
             set_lshoulder = current_shoulder
             set_rshoulder = current_shoulder
@@ -333,11 +410,10 @@ var uihandle = Handler()
             set_rweist = current_weist
             set_lbutt = current_butt
             set_rbutt = current_butt
-            set_lleg = current_leg
-            set_rleg = current_leg
+
         }
     }
-
+*/
 
 
     val l = object : View.OnTouchListener  {
@@ -352,52 +428,9 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(mode == "cohe"&& ble_cnt) {
-                var set = 0x01.toByte()
-
-
-                //if(airbag12 == true)set = 0x03.toByte()
-
-                var cmd = get_command("tune", set , bed_lrb , 0x01.toByte(), (current_head).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",(current_head).toByte().toString())
-
-                //var res = send_command(cmd)
-                //Log.e("result:", res.toString())
-                //sleep(100)
-/*
-    var pullstart = arrayListOf<Boolean>(false , false , false , false , false , false)
-    var pulltimer = arrayListOf<Int>(0,0,0,0,0,0)
-    var pulllevel = arrayListOf<Int>(16,16,16,16,16,16)
- */
-//////////////////////pool count
-                if(!pullstart[0]){
-                    pullstart[0] = true
-                    pulltimer[0] = 0
-                    pulllevel[0] = current_head
-                }
-                else{
-                    pulltimer[0] = 0
-                    pulllevel[0] = current_head
-                }
-//////////////////////pool count
-
-
-            }///////send command
-            else if(mode == "cade"&& ble_cnt){
-                if(cade_1==3 || cade_1 ==bed_lrb) {
-
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-            if(mode == "cohe"&&bed_lrb == 0){
-                //set_head = current_head
-                set_lhead = current_head
-                set_rhead = current_head
-
-
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+                var com = byteArrayOf(bed_lrb.toByte(),pos_1,current_head.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
 
         }
@@ -414,56 +447,11 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(mode == "cohe"&& ble_cnt) {
-
-                var set = 0x02.toByte()
-
-
-
-                var cmd = get_command("tune",set , bed_lrb , 0x02.toByte(), (current_neck).toByte(),
-                    0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-
-                Log.e("command send",cmd.toString())
-                //var res = send_command(cmd)
-               // Log.e("result:", res.toString())
-
-                //sleep(100)
-
-//////////////////////pool count
-                if(!pullstart[1]){
-                    pullstart[1] = true
-                    pulltimer[1] = 0
-                    pulllevel[1] = current_neck
-                }
-                else{
-                    pulltimer[1] = 0
-                    pulllevel[1] = current_neck
-                }
-//////////////////////pool count
-
-
-
-
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+                var com = byteArrayOf(bed_lrb.toByte(),pos_2,current_neck.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
-            else if(mode == "cade"&& ble_cnt){
-                if(cade_2==3 || cade_2 ==bed_lrb) {
 
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-
-            if(mode == "cohe"&&bed_lrb == 0){
-                //set_neck = current_neck
-                set_lneck = current_neck
-                set_rneck = current_neck
-
-
-                    //set_head = current_head
-                    set_lhead = current_head
-                    set_rhead = current_head
-
-            }
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -481,42 +469,9 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(mode == "cohe"&& ble_cnt) {
-
-
-                //Log.e("command send",cmd.toString())
-                //var res = send_command(cmd)
-                //Log.e("result:", res.toString())
-                //sleep(100)
-
-//////////////////////pool count
-                if(!pullstart[2]){
-                    pullstart[2] = true
-                    pulltimer[2] = 0
-                    pulllevel[2] = current_shoulder
-                }
-                else{
-                    pulltimer[2] = 0
-                    pulllevel[2] = current_shoulder
-                }
-//////////////////////pool count
-
-            }//////send command
-            else if(mode == "cade"&& ble_cnt){
-                if(cade_3==3 || cade_3 ==bed_lrb) {
-
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-
-            if(mode == "cohe"&&bed_lrb == 0){
-                // set_shoulder = current_shoulder
-                set_lshoulder = current_shoulder
-                set_rshoulder = current_shoulder
-                set_lleg = current_leg
-                set_rleg = current_leg
-
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+                var com = byteArrayOf(bed_lrb.toByte(),pos_3,current_shoulder.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
 
         }
@@ -524,11 +479,9 @@ var uihandle = Handler()
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_shoulder = progress /5
-                current_leg = current_shoulder
                 sb_shoulder?.setProgress(progress)
-                sb_leg?.setProgress(progress)
                 num_shoulder.text = "$current_shoulder"
-                num_leg.text = "$current_leg"
+
 
         }
     }//////shoulder draggable
@@ -538,39 +491,12 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(mode == "cohe" && ble_cnt) {
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
 
-
-                //Log.e("command send",cmd.toString())
-                //var res = send_command(cmd)
-                //Log.e("result:", res.toString())
-
-//////////////////////pool count
-                if(!pullstart[3]){
-                    pullstart[3] = true
-                    pulltimer[3] = 0
-                    pulllevel[3] = current_back
-                }
-                else{
-                    pulltimer[3] = 0
-                    pulllevel[3] = current_back
-                }
-//////////////////////pool count
-
-                //sleep(100)
+                var com = byteArrayOf(bed_lrb.toByte(),pos_4,current_back.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
-            else if(mode == "cade"&& ble_cnt){
-                if(cade_4==3 || cade_4 ==bed_lrb) {
 
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-
-            if(mode == "cohe"&&bed_lrb == 0){
-                set_lback = current_back
-                set_rback = current_back
-            }
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -587,37 +513,10 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?){
-            if(mode == "cohe" && ble_cnt){
-
-
-
-//////////////////////pool count
-                if(!pullstart[4]){
-                    pullstart[4] = true
-                    pulltimer[4] = 0
-                    pulllevel[4] = current_weist
-                }
-                else{
-                    pulltimer[4] = 0
-                    pulllevel[4] = current_weist
-                }
-//////////////////////pool count
-
-                //sleep(100)
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+                var com = byteArrayOf(bed_lrb.toByte(),pos_5,current_weist.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
-            else if(mode == "cade"&& ble_cnt){
-                if(cade_5==3 || cade_5 ==bed_lrb) {
-
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-
-            if(mode == "cohe"&&bed_lrb == 0){
-                set_lweist = current_weist
-                set_rweist = current_weist
-            }
-
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -633,41 +532,11 @@ var uihandle = Handler()
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(mode == "cohe" && ble_cnt) {
-
-                //Log.e("command send",cmd.toString())
-                //var res = send_command(cmd)
-                //Log.e("result:", res.toString())
-
-
-//////////////////////pool count
-                if(!pullstart[5]){
-                    pullstart[5] = true
-                    pulltimer[5] = 0
-                    pulllevel[5] = current_butt
-                }
-                else{
-                    pulltimer[5] = 0
-                    pulllevel[5] = current_butt
-                }
-//////////////////////pool count
-
-                //sleep(100)
+            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+                var com = byteArrayOf(bed_lrb.toByte(),pos_6,current_butt.toByte())
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
 
-
-            else if(mode == "cade"&& ble_cnt ){
-                if(cade_6==3 || cade_6 ==bed_lrb){
-                    //Log.e("command send",(current_head).toByte().toString())
-                    //var res = send_command(cmd)
-                }
-            }///////cade send command
-
-
-            if(mode == "cohe"&&bed_lrb == 0){
-                set_lbutt = current_butt
-                set_rbutt = current_butt
-            }
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
@@ -679,6 +548,7 @@ var uihandle = Handler()
 
     }///////butt draggable
 
+
     fun findviewID1(){
         //////////////////////findviewbyid
         setContentView(R.layout.activity_bed_adjust)
@@ -688,7 +558,6 @@ var uihandle = Handler()
         num_back = findViewById(R.id.num_back)
         num_weist = findViewById(R.id.num_weist)
         num_butt =findViewById(R.id.num_butt)
-        num_leg = findViewById(R.id.num_leg)
 
 
         /////disable watchbar first
@@ -698,7 +567,6 @@ var uihandle = Handler()
         sb_back = findViewById(R.id.wb_back);
         sb_weist = findViewById(R.id.wb_weist);
         sb_butt = findViewById(R.id.wb_butt);
-        sb_leg = findViewById(R.id.wb_leg);
 /////////
         sb_head?.setEnabled(false)
         sb_neck?.setEnabled(false)
@@ -706,7 +574,6 @@ var uihandle = Handler()
         sb_back?.setEnabled(false)
         sb_weist?.setEnabled(false)
         sb_butt?.setEnabled(false)
-        sb_leg?.setEnabled(false)
 //////////
 
 
@@ -723,7 +590,6 @@ var uihandle = Handler()
         sb_back = findViewById(R.id.sb_back);
         sb_weist = findViewById(R.id.sb_weist);
         sb_butt = findViewById(R.id.sb_butt);
-        sb_leg = findViewById(R.id.sb_leg);
 //////////////////////findviewbyid
         sb_head?.setOnSeekBarChangeListener(tune_head)
         sb_neck?.setOnSeekBarChangeListener(tune_neck)
@@ -731,7 +597,6 @@ var uihandle = Handler()
         sb_back?.setOnSeekBarChangeListener(tune_back)
         sb_weist?.setOnSeekBarChangeListener(tune_weist)
         sb_butt?.setOnSeekBarChangeListener(tune_butt)
-        sb_leg?.setOnSeekBarChangeListener(tune_shoulder)
 
         bed_btn = findViewById(R.id.bed_btn)
         bed_icn = findViewById(R.id.bed_icn)
@@ -761,12 +626,12 @@ var uihandle = Handler()
     }
     fun num2char(a :Int):Char{
         when(a){
-            15->return 'F'
-            14->return 'E'
-            13->return 'D'
-            12->return 'C'
-            11->return 'B'
-            10->return 'A'
+            15->return 'f'
+            14->return 'e'
+            13->return 'd'
+            12->return 'c'
+            11->return 'b'
+            10->return 'a'
             9-> return '9'
             8-> return '8'
             7-> return '7'
@@ -792,7 +657,10 @@ var uihandle = Handler()
                 false,
                 gattCallback
             )
+
         }
+
+
     }
 
     override fun onDestroy() {
@@ -828,6 +696,9 @@ var uihandle = Handler()
                         strtmp += ":"
                     }
                     wifi_mac = strtmp.dropLast(1)
+
+                    mqttconnect()
+
                     Log.d("onVerMac",wifi_mac)
                 }/////get version and mac
                 INFO_UUID->{
@@ -858,7 +729,7 @@ var uihandle = Handler()
                 UUID.fromString(VER_MAC_UUID)->{
                     var wifi_ByteArray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
                     Log.d("onVerMac",wifi_ByteArray.toString())
-                    //wifi_mac =
+
 
                 }/////get version and mac
                 UUID.fromString(INFO_UUID)->{
@@ -1048,14 +919,14 @@ var uihandle = Handler()
     fun clickbed(view: View) {
 
 
-        if(bed_lrb ==0){
+        if(bed_lrb ==2){
             set_head = current_head
             set_neck = current_neck
             set_shoulder = current_shoulder
             set_back = current_back
             set_weist = current_weist
             set_butt = current_butt
-            set_leg = current_leg
+
 
             current_head = set_lhead
             current_neck = set_lneck
@@ -1063,7 +934,6 @@ var uihandle = Handler()
             current_back = set_lback
             current_weist = set_lweist
             current_butt = set_lbutt
-            current_leg = set_lleg
 
             sb_head?.setProgress(current_head*5)
             sb_neck?.setProgress(current_neck*5)
@@ -1071,12 +941,11 @@ var uihandle = Handler()
             sb_back?.setProgress(current_back*5)
             sb_weist?.setProgress(current_weist*5)
             sb_butt?.setProgress(current_butt*5)
-            sb_leg?.setProgress(current_leg*5)
 
             bed_btn.setImageResource(R.drawable.bed_left)
             bed_icn.setImageResource(R.drawable.small_l)
 
-            bed_lrb = 1
+            bed_lrb = 0
 
             ///UI set
             set_bedUI()
@@ -1084,7 +953,7 @@ var uihandle = Handler()
 
 
         }//////change to left
-        else if(bed_lrb ==1){
+        else if(bed_lrb ==0){
 
             set_lhead = current_head
             set_lneck = current_neck
@@ -1092,7 +961,6 @@ var uihandle = Handler()
             set_lback = current_back
             set_lweist = current_weist
             set_lbutt = current_butt
-            set_lleg = current_leg
 
             current_head = set_rhead
             current_neck = set_rneck
@@ -1100,7 +968,6 @@ var uihandle = Handler()
             current_back = set_rback
             current_weist = set_rweist
             current_butt = set_rbutt
-            current_leg = set_rleg
 
             sb_head?.setProgress(current_head*5)
             sb_neck?.setProgress(current_neck*5)
@@ -1108,20 +975,19 @@ var uihandle = Handler()
             sb_back?.setProgress(current_back*5)
             sb_weist?.setProgress(current_weist*5)
             sb_butt?.setProgress(current_butt*5)
-            sb_leg?.setProgress(current_leg*5)
 
 
 
             bed_btn.setImageResource(R.drawable.bed_right)
             bed_icn.setImageResource(R.drawable.small_r)
-            bed_lrb = 2
+            bed_lrb = 1
 
             ///UI set
             set_bedUI()
             ///UI set
 
         }//////change to right
-        else if(bed_lrb == 2){
+        else if(bed_lrb == 1){
 
             set_rhead = current_head
             set_rneck = current_neck
@@ -1129,7 +995,6 @@ var uihandle = Handler()
             set_rback = current_back
             set_rweist = current_weist
             set_rbutt = current_butt
-            set_rleg = current_leg
 
             current_head = set_head
             current_neck = set_neck
@@ -1137,7 +1002,6 @@ var uihandle = Handler()
             current_back = set_back
             current_weist = set_weist
             current_butt = set_butt
-            current_leg = set_leg
 
             sb_head?.setProgress(current_head*5)
             sb_neck?.setProgress(current_neck*5)
@@ -1145,12 +1009,11 @@ var uihandle = Handler()
             sb_back?.setProgress(current_back*5)
             sb_weist?.setProgress(current_weist*5)
             sb_butt?.setProgress(current_butt*5)
-            sb_leg?.setProgress(current_leg*5)
 
 
             bed_btn.setImageResource(R.drawable.bed_all)
             bed_icn.setImageResource(R.drawable.small_lr)
-            bed_lrb = 0
+            bed_lrb = 2
 
             ///cadence UI set
             //set_UI(bed_lrb)
@@ -1162,18 +1025,23 @@ var uihandle = Handler()
     private fun set_bedUI() {
 
     }
+
     private fun broadcastUpdate(action: String) {
         val intent = Intent(action)
         sendBroadcast(intent)
     }
 
     fun clicktrans1(view: View) {
+        mode = "cohe"
+        findviewID1()
 
     }
     fun clickcadence1(view: View) {
+        mode = "cade"
         findviewID2()
     }
     fun clickmedi1(view: View) {
+        mode = "medi"
         findviewID3()
     }
 
