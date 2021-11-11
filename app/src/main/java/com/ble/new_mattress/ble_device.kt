@@ -363,7 +363,7 @@ class ble_device : AppCompatActivity() {
                     // hashMap.put("name", CD.name + "(connected)")
                     // hashMap.put("misc", CD.address)
                     val hashMap: java.util.HashMap<String, String> = java.util.HashMap()
-                    hashMap.put("name", CD.name)
+                    hashMap.put("name", CD.name + "(已連接)")
                     hashMap.put("misc", CD.address)
                     if (!BLE_nameList.contains(hashMap)){
                         BLE_nameList += hashMap

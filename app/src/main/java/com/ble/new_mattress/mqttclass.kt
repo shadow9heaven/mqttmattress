@@ -8,11 +8,13 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import android.net.Uri;
 import MAVLink.Parser;
+import MAVLink.bluetooth.msg_ble_ack
 import MAVLink.bluetooth.msg_connect
 import MAVLink.bootloader.msg_bl_command
 import MAVLink.bootloader.msg_bl_ota
 import MAVLink.smartmattress.*
 import com.ble.new_mattress.FLAG_WIFI_CONNECT
+import com.ble.new_mattress.bed_pressure
 
 @ExperimentalUnsignedTypes
 class MqttClass {
@@ -30,7 +32,7 @@ class MqttClass {
             override fun messageArrived(topic: String?, message: MqttMessage?) {
                 val message2UByte = message!!.payload
 
-                Log.d(TAG, "Receive message2ubyte: ${message2UByte} from topic: $topic")
+                //Log.d(TAG, "Receive message2ubyte: ${message2UByte} from topic: $topic")
                 //val parsedByteArray =
                 var mvlnk_partest = Parser()
                 var parsertmp :MAVLinkPacket ?= null
@@ -53,6 +55,13 @@ class MqttClass {
                             respac.unpack(parsertmp.payload)
                         }/////3
 
+                        msg_ble_ack.MAVLINK_MSG_ID_BLE_ACK->{
+                            val respac : msg_ble_ack  = msg_ble_ack()
+                            respac.unpack(parsertmp.payload)
+                            val ack = respac.ack_code
+
+                            Log.d("parse result","30-MAVLINK_MSG_ID_BLE_ACK : " +ack.toString())
+                        }//////30
                         msg_connect.MAVLINK_MSG_ID_CONNECT->{
                             Log.d("parse result","54-MAVLINK_MSG_ID_MEDITATION")
                             val respac : msg_adjust_hardness  = msg_adjust_hardness()
@@ -60,10 +69,23 @@ class MqttClass {
                         }/////34
 
                         ////for smart ress
+                        msg_mattress_ack.MAVLINK_MSG_ID_MATTRESS_ACK->{
+                            val respac : msg_mattress_ack  = msg_mattress_ack()
+                            respac.unpack(parsertmp.payload)
+                            val ack = respac.ack_code
+
+                            Log.d("parse result","51-MAVLINK_MSG_ID_MATTRESS_ACK : " +ack.toString())
+
+                        }/////51
                         msg_adjust_hardness.MAVLINK_MSG_ID_ADJUST_HARDNESS->{
-                            Log.d("parse result","54-MAVLINK_MSG_ID_MEDITATION")
                             val respac : msg_adjust_hardness  = msg_adjust_hardness()
                             respac.unpack(parsertmp.payload)
+                            val pktype = respac.pk_type
+                            val level  = respac.level
+                            val pos = respac.pos
+                            val sub_bed = respac.sub_bed
+
+                            Log.d("parse result","52-MAVLINK_MSG_ID_ADJUST_HARDNESS "+ sub_bed.toString() +"-"+pos.toString() +" : " +level.toString() )
 
                         }/////52
 
@@ -90,17 +112,20 @@ class MqttClass {
 
                         ///////56 for pressure
                         msg_pressure.MAVLINK_MSG_ID_PRESSURE->{
-                            Log.d("parse result","56-MAVLINK_MSG_ID_PRESSURE")
                             val respac : msg_pressure  =  msg_pressure()
                             respac.unpack(parsertmp.payload)
                             val pressure = respac.pressure
                             val timestamp = respac.timestamp
 
-                            Log.d("pressure",pressure.asList().toString())
-                            Log.d("timestamp",timestamp.toString())
+                            pressure.copyInto(bed_pressure,0,2,22)
+
+                            //Log.d("parse result","56-MAVLINK_MSG_ID_PRESSURE")
+                            //Log.d("pressure",pressure.asList().toString())
+                            //Log.d("timestamp",timestamp.toString())
                         }///pressure 56
 
                         msg_pump_status.MAVLINK_MSG_ID_PUMP_STATUS->{
+
                             Log.d("parse result","57-MAVLINK_MSG_ID_PUMP_STATUS")
                             val respac : msg_pump_status  =  msg_pump_status()
                             respac.unpack(parsertmp.payload)
@@ -108,10 +133,11 @@ class MqttClass {
                             val timestamp = respac.timestamp
 
                             Log.d("status", status.asList().toString())
-                            Log.d("timestamp",timestamp.toString())
+                            //Log.d("timestamp",timestamp.toString())
                         }///pump status 57
 
                         msg_step_status.MAVLINK_MSG_ID_STEP_STATUS->{
+
                             Log.d("parse result","58-MAVLINK_MSG_ID_step_STATUS")
                             val respac : msg_step_status  =  msg_step_status()
                             respac.unpack(parsertmp.payload)
@@ -121,15 +147,15 @@ class MqttClass {
 
                             Log.d("status", status.asList().toString())
                             Log.d("position", position.asList().toString())
-                            Log.d("timestamp",timestamp.toString())
+                            //Log.d("timestamp",timestamp.toString())
                         }///step status 58
 
                         msg_request_data.MAVLINK_MSG_ID_REQUEST_DATA->{
-
-
+                            Log.d("parse result","59-request_data")
                         }/////59
 
                         msg_control_pump.MAVLINK_MSG_ID_CONTROL_PUMP->{
+
                             Log.d("parse result","60-control_pump")
                             val respac : msg_control_pump =  msg_control_pump()
                             respac!!.unpack(parsertmp.payload)
@@ -138,6 +164,7 @@ class MqttClass {
                         }/////60
 
                         msg_control_step.MAVLINK_MSG_ID_CONTROL_STEP->{
+
                             Log.d("parse result","61-control_step")
                             val respac : msg_control_step =  msg_control_step()
                             respac!!.unpack(parsertmp.payload)
@@ -189,6 +216,7 @@ class MqttClass {
             mqttClient!!.subscribe(topic, qos, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d(TAG, "Subscribed to $topic")
+
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {

@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:text="16"
+                android:text="2"
                 />
             <FrameLayout
                 android:layout_height="300dp"
@@ -73,7 +73,7 @@
                     android:layout_width="300dp"
                     android:layout_height="match_parent"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false"
                     android:foregroundGravity="left"
                     android:layout_gravity="center"
@@ -91,7 +91,7 @@
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
 
-                    android:progress="80"
+                    android:progress="10"
                     />
             </FrameLayout>
 
@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="16" />
+                android:text="2" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -137,7 +137,7 @@
                     android:layout_width="300dp"
                     android:layout_height="match_parent"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false"
                     android:layout_gravity="center"
                     />
@@ -153,7 +153,7 @@
                     android:progressDrawable="@drawable/draw_seekbar"
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
-                    android:progress="80" />
+                    android:progress="10" />
 
             </FrameLayout>
             <TextView
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="16"
+                android:text="2"
                 />
 
             <FrameLayout
@@ -199,7 +199,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false" />
                 <SeekBar
                     android:id="@+id/sb_shoulder"
@@ -212,7 +212,7 @@
                     android:progressDrawable="@drawable/draw_seekbar"
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
-                    android:progress="80" />
+                    android:progress="10" />
             </FrameLayout>
 
             <TextView
@@ -242,7 +242,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="16" />
+                android:text="2" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -259,7 +259,7 @@
                     android:layout_gravity="center"
                     android:layout_centerInParent="true"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false"/>
                 <SeekBar
                     android:id="@+id/sb_back"
@@ -273,7 +273,7 @@
                     android:progressDrawable="@drawable/draw_seekbar"
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
-                    android:progress="80" />
+                    android:progress="10" />
 
             </FrameLayout>
 
@@ -303,7 +303,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:text="16" />
+                android:text="2" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -320,7 +320,7 @@
                     android:layout_gravity="center"
                     android:layout_centerInParent="true"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false" />
                 <SeekBar
                     android:id="@+id/sb_weist"
@@ -334,7 +334,7 @@
                     android:progressDrawable="@drawable/draw_seekbar"
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
-                    android:progress="80" />
+                    android:progress="10" />
 
             </FrameLayout>
 
@@ -364,7 +364,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="16"
+                android:text="2"
                 android:textStyle="bold" />
             <FrameLayout
                 android:layout_height="300dp"
@@ -380,7 +380,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:rotation="270"
-                    android:progress="80"
+                    android:progress="10"
                     android:saveEnabled="false" />
                 <SeekBar
                     android:id="@+id/sb_butt"
@@ -393,7 +393,7 @@
                     android:progressDrawable="@drawable/draw_seekbar"
                     android:maxHeight="3dp"
                     android:minHeight="3dp"
-                    android:progress="80"/>
+                    android:progress="10"/>
 
             </FrameLayout>
 
@@ -406,6 +406,19 @@
                 android:text="6" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_pressure"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.45"
+            />
 
         <ImageView
             android:id = "@+id/bed_icn"
@@ -419,7 +432,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.95"
-            app:srcCompat="@drawable/small_lr" />
+            app:srcCompat="@drawable/small_r" />
 
 
 
@@ -427,7 +440,6 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="clicklogo"
 
             app:srcCompat="@drawable/logo_small"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -452,7 +464,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.16"
-            app:srcCompat="@drawable/bed_all"
+            app:srcCompat="@drawable/bed_right"
             />
 
         <ImageButton

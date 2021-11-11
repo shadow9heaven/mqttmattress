@@ -8,23 +8,21 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Handler
-import android.os.SystemClock
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
-import java.lang.Exception
 import java.util.*
 import kotlin.system.exitProcess
+
+
 //////global variable
 var ble_cnt = false
 var bleaddress = ""
@@ -58,6 +56,17 @@ val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 var FLAG_WIFI_CONNECT = false
 
 ///////global flag
+
+//////////bed status
+var bed_pressure = longArrayOf(
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0
+)
+
+//////////bed status
+
 
 //////global variable
 
@@ -96,7 +105,11 @@ class MainActivity : AppCompatActivity() {
                 ble_cnt = false
                 var bleaddress = ""
                 broadcastUpdate(ACTION_GATT_DISCONNECTED);
-                runOnUiThread { ib_ble.setImageResource(R.drawable.bt_off) }
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Disconnect!!", Toast.LENGTH_SHORT)
+                    ib_ble.setImageResource(R.drawable.bt_off)
+                }
+
             }
         }
         override fun onDescriptorRead(
@@ -133,7 +146,11 @@ class MainActivity : AppCompatActivity() {
                     bleaddress = SavedBleAddr
                     bluetoothDevice = result!!.device
                     ib_ble.setImageResource(R.drawable.bt_on)
-
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Connect to " + bleaddress + "!!",
+                        Toast.LENGTH_SHORT
+                    )
 
                     FLAG_FOUNDDEVICE = false
 
@@ -163,8 +180,8 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(intent, 1)
             }
         }
-        catch(e :java.lang.Exception){
-            Log.e("bleAdapter",e.message!!)
+        catch (e: java.lang.Exception){
+            Log.e("bleAdapter", e.message!!)
         }
 
 
@@ -182,8 +199,8 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        catch(e :Exception){
-            Log.d("readble",e.message!!)
+        catch (e: Exception){
+            Log.d("readble", e.message!!)
         }
 
 
@@ -213,22 +230,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         broadcastUpdate(ACTION_GATT_DISCONNECTED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
-            1->{
-                if(resultCode == RESULT_OK){
+            1 -> {
+                if (resultCode == RESULT_OK) {
                     ib_ble.setImageResource(R.drawable.bt_on)
                 }
             }/////ble device
-            2->{
+            2 -> {
 
 
             }/////bed adjust
-            8->{
+            8 -> {
 
             }/////terms
 
@@ -244,26 +262,30 @@ class MainActivity : AppCompatActivity() {
         if(grantResults[0] == PackageManager.PERMISSION_GRANTED ){
 
             when(requestCode){
-                9->{
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED){
+                9 -> {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        != PackageManager.PERMISSION_GRANTED
+                    ) {
                         ActivityCompat.requestPermissions(
                             this,
                             arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
                             18
                         )
                     }////ask fine location
-                    else{
+                    else {
                         //opentermsActivity()
                     }
                 }//////write external storage
-                18->{
+                18 -> {
                     opentermsActivity()
                 }//////access fine location
             }/////if granted
         }
         else{
-            Toast.makeText(this,"Can't get permission!!",Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Can't get permission!!", Toast.LENGTH_SHORT)
             moveTaskToBack(true);
             exitProcess(-1)
         }
@@ -274,7 +296,7 @@ class MainActivity : AppCompatActivity() {
     fun opentermsActivity(){
         val intent2 = Intent(this, Terms::class.java)
         //intent.putExtra("mgatt", mgatt)
-        startActivityForResult(intent2,8)
+        startActivityForResult(intent2, 8)
     }
 
     private fun broadcastUpdate(action: String) {
