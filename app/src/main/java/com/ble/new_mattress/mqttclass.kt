@@ -262,6 +262,7 @@ class MqttClass {
 
     fun disconnect() {
         try {
+            mqttClient!!.unregisterResources()
             mqttClient!!.disconnect(null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d(TAG, "Disconnected")
@@ -271,6 +272,7 @@ class MqttClass {
                     Log.d(TAG, "Failed to disconnect")
                 }
             })
+
         } catch (e: MqttException) {
             e.printStackTrace()
         }

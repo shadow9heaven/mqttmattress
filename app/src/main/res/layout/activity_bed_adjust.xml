@@ -51,14 +51,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:contextClickable="false"
+            >
             <TextView
                 android:id="@+id/num_head"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:text="2"
+                android:text="1"
                 />
             <FrameLayout
                 android:layout_height="300dp"
@@ -122,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="2" />
+                android:text="1" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -182,7 +184,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="2"
+                android:text="1"
                 />
 
             <FrameLayout
@@ -242,7 +244,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:gravity = "center"
-                android:text="2" />
+                android:text="1" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -303,7 +305,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:text="2" />
+                android:text="1" />
 
             <FrameLayout
                 android:layout_height="300dp"
@@ -358,13 +360,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:contextClickable="false"
+            >
             <TextView
                 android:id="@+id/num_butt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="2"
+                android:text="1"
                 android:textStyle="bold" />
             <FrameLayout
                 android:layout_height="300dp"

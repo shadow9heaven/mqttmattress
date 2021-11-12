@@ -162,6 +162,7 @@ class bed_adjust : AppCompatActivity() {
     lateinit var num_weist : TextView
     lateinit var num_butt : TextView
 
+
     var current_head = 2
     var current_neck = 2
     var current_shoulder = 2
@@ -190,6 +191,8 @@ class bed_adjust : AppCompatActivity() {
     var set_rback = 2
     var set_rweist = 2
     var set_rbutt = 2
+
+    val progressdivide = 5
 
     val queue_cmd : Queue<ByteArray> = LinkedList<ByteArray>(listOf())
     var queue_retry = 0
@@ -246,6 +249,7 @@ private  val cmdthread :Thread = Thread{
 
     fun mqttdisconnect(){
         mqttclass!!.disconnect()
+        //unregisterReceiver()
     }
 
 
@@ -422,7 +426,7 @@ private  val cmdthread :Thread = Thread{
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            current_head = progress / 5
+            current_head = progress / progressdivide
             num_head.text = "$current_head"
         }
     }////////head draggable
@@ -443,7 +447,7 @@ private  val cmdthread :Thread = Thread{
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             //if(mode == "cohe") {
-            current_neck = progress /5
+            current_neck = progress /progressdivide
             //set_neck = current_neck
             num_neck.text = "$current_neck"
 
@@ -466,7 +470,7 @@ private  val cmdthread :Thread = Thread{
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
-                current_shoulder = progress /5
+                current_shoulder = progress / progressdivide
                 sb_shoulder?.setProgress(progress)
                 num_shoulder.text = "$current_shoulder"
 
@@ -489,7 +493,7 @@ private  val cmdthread :Thread = Thread{
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
-                current_back = progress /5
+                current_back = progress / progressdivide
                 num_back.text = "$current_back"
 
 
@@ -510,7 +514,7 @@ private  val cmdthread :Thread = Thread{
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
-                current_weist = progress /5
+                current_weist = progress / progressdivide
                 num_weist.text = "$current_weist"
 
         }
@@ -531,7 +535,7 @@ private  val cmdthread :Thread = Thread{
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
 
-                current_butt = progress /5
+                current_butt = progress / progressdivide
                 num_butt.text = "$current_butt"
 
         }
@@ -931,7 +935,9 @@ private  val cmdthread :Thread = Thread{
     }
 
     fun clickbed(view: View) {
+
         FLAG_CLICK_BED = true
+
         if(bed_lrb ==0){
             set_head = current_head
             set_neck = current_neck
@@ -948,12 +954,12 @@ private  val cmdthread :Thread = Thread{
             current_weist = set_lweist
             current_butt = set_lbutt
 
-            sb_head?.setProgress(current_head*5)
-            sb_neck?.setProgress(current_neck*5)
-            sb_shoulder?.setProgress(current_shoulder*5)
-            sb_back?.setProgress(current_back*5)
-            sb_weist?.setProgress(current_weist*5)
-            sb_butt?.setProgress(current_butt*5)
+            sb_head?.setProgress(current_head*progressdivide)
+            sb_neck?.setProgress(current_neck*progressdivide)
+            sb_shoulder?.setProgress(current_shoulder*progressdivide)
+            sb_back?.setProgress(current_back*progressdivide)
+            sb_weist?.setProgress(current_weist*progressdivide)
+            sb_butt?.setProgress(current_butt*progressdivide)
 
             bed_btn.setImageResource(R.drawable.bed_left)
             bed_icn.setImageResource(R.drawable.small_l)
@@ -963,7 +969,6 @@ private  val cmdthread :Thread = Thread{
             ///UI set
             set_bedUI()
             ///UI set
-
 
         }//////change to left
         else if(bed_lrb ==1){
@@ -982,14 +987,12 @@ private  val cmdthread :Thread = Thread{
             current_weist = set_rweist
             current_butt = set_rbutt
 
-            sb_head?.setProgress(current_head*5)
-            sb_neck?.setProgress(current_neck*5)
-            sb_shoulder?.setProgress(current_shoulder*5)
-            sb_back?.setProgress(current_back*5)
-            sb_weist?.setProgress(current_weist*5)
-            sb_butt?.setProgress(current_butt*5)
-
-
+            sb_head?.setProgress(current_head*progressdivide)
+            sb_neck?.setProgress(current_neck*progressdivide)
+            sb_shoulder?.setProgress(current_shoulder*progressdivide)
+            sb_back?.setProgress(current_back*progressdivide)
+            sb_weist?.setProgress(current_weist*progressdivide)
+            sb_butt?.setProgress(current_butt*progressdivide)
 
             bed_btn.setImageResource(R.drawable.bed_right)
             bed_icn.setImageResource(R.drawable.small_r)
@@ -1016,12 +1019,12 @@ private  val cmdthread :Thread = Thread{
             current_weist = set_weist
             current_butt = set_butt
 
-            sb_head?.setProgress(current_head*5)
-            sb_neck?.setProgress(current_neck*5)
-            sb_shoulder?.setProgress(current_shoulder*5)
-            sb_back?.setProgress(current_back*5)
-            sb_weist?.setProgress(current_weist*5)
-            sb_butt?.setProgress(current_butt*5)
+            sb_head?.setProgress(current_head*progressdivide)
+            sb_neck?.setProgress(current_neck*progressdivide)
+            sb_shoulder?.setProgress(current_shoulder*progressdivide)
+            sb_back?.setProgress(current_back*progressdivide)
+            sb_weist?.setProgress(current_weist*progressdivide)
+            sb_butt?.setProgress(current_butt*progressdivide)
 
 
             bed_btn.setImageResource(R.drawable.bed_all)
@@ -1031,10 +1034,10 @@ private  val cmdthread :Thread = Thread{
             ///cadence UI set
             //set_UI(bed_lrb)
             ///cadence UI set
-
         }///////change to both
 
         FLAG_CLICK_BED = false
+
     }////////click bed
 
     private fun set_bedUI() {
