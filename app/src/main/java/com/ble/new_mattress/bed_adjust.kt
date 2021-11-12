@@ -80,18 +80,17 @@ class bed_adjust : AppCompatActivity() {
 //////for mqtt protocol
 
 /////FLAG
-
-    var FLAG_WAIT_ACK = false
-    var FLAG_DESCRIPTOR = false
+    var FLAG_MATTRESS_ACK = false
+    var FLAG_MQTT_CONNECT = false
     var FLAG_CLICK_BED = false
 /////FLAG
+
+
 
     lateinit var extFile: File
     var soundexist: Boolean = false
 
     lateinit var mediaPlayer: MediaPlayer
-    lateinit var drawer: NavigationView
-    lateinit var dl_th : DrawerLayout
 
     var mode = "cohe"
     private val DATA_DIRECTORY = "LOG_DATA"
@@ -192,7 +191,8 @@ class bed_adjust : AppCompatActivity() {
     var set_rweist = 2
     var set_rbutt = 2
 
-
+    val queue_cmd : Queue<ByteArray> = LinkedList<ByteArray>(listOf())
+    var queue_retry = 0
 
 ////////runnable
 ///////////handler function
@@ -218,11 +218,22 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 }////uihandle?.postDelayed(uiRunnable, 0)///////run
     //// uihandle.removeCallbacks(uiRunnable)///stop
+
+////////command thread
+
+private  val cmdthread :Thread = Thread{
+    while(FLAG_MQTT_CONNECT){
+
+
+        Thread.sleep(1000)
+    }
+}
+
+////////command thread
 ///////////handler function
 
-
-
 ////////runnable
+
     /////mqtt function
 
     fun mqttconnect() {
@@ -272,8 +283,6 @@ private val uiRunnable: Runnable = object : Runnable {
                 val mavpac = msg_adjust_hardness(0x55,bed_lrb.toShort() , pos ,level)
 
                 publishmsg!!.setPayload(mavpac.pack().encodePacket())
-
-
             }/////52
             CMD_RELIEVE_STRESS->{
 
@@ -328,17 +337,17 @@ private val uiRunnable: Runnable = object : Runnable {
             mqttclass!!.publish(thistopic, publishmsg , 1)
         }
     }
+
     fun mqttsub(){
         mqttclass!!.subscribe(topic1+"/" + topic2[0] + "/" + wifi_mac , 1)////control
         mqttclass!!.subscribe(topic1+"/" + topic2[1] + "/" + wifi_mac , 1)///sensor
         mqttclass!!.subscribe(topic1+"/" + topic2[2] + "/" + wifi_mac , 1)////ack
-
     }
+
     fun mqttunsub(){
         mqttclass!!.unsubscribe("#")
     }
     /////mqtt function
-
 
 
     fun change_time(sec:Int) : String{
@@ -390,71 +399,13 @@ private val uiRunnable: Runnable = object : Runnable {
             }
     }
 
-/*
-    fun set_347(progresa : Int){
-        var progress =  progresa /5
-        if(current_shoulder != progress){
-            current_shoulder = progress
-            sb_shoulder?.setProgress(progresa)
-            num_shoulder.text = "$current_shoulder"
-        }
-        if(current_back != progress){
-            current_back = progress
-            sb_back?.setProgress(progresa)
-            num_back.text = "$current_back"
-        }
-
-        if(mode == "cohe"&&bed_lrb == 0){
-            set_lshoulder = current_shoulder
-            set_rshoulder = current_shoulder
-            set_lback = current_back
-            set_rback = current_back
-        }
-
-    }
-    fun set_34567(progresa : Int){
-        var progress = progresa /5
-        if(current_shoulder != progress){
-            current_shoulder = progress
-            sb_shoulder?.setProgress(progresa)
-            num_shoulder.text = "$current_shoulder"
-        }
-        if(current_back != progress){
-            current_back = progress
-            sb_back?.setProgress(progresa)
-            num_back.text = "$current_back"
-        }
-        if(current_weist != progress){
-            current_weist = progress
-            sb_weist?.setProgress(progresa)
-            num_weist.text = "$current_weist"
-        }
-        if(current_butt != progress){
-            current_butt = progress
-            sb_butt?.setProgress(progresa)
-            num_butt.text = "$current_butt"
-        }
-
-        if(mode == "cohe"&&bed_lrb == 0){
-            set_lshoulder = current_shoulder
-            set_rshoulder = current_shoulder
-            set_lback = current_back
-            set_rback = current_back
-            set_lweist = current_weist
-            set_rweist = current_weist
-            set_lbutt = current_butt
-            set_rbutt = current_butt
-
-        }
-    }
-*/
-
 
     val l = object : View.OnTouchListener  {
         override fun onTouch(v:View, event: MotionEvent):Boolean{
             return true
         }
     }/////seekbar undraggable
+
 
     val tune_head     = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -683,8 +634,8 @@ private val uiRunnable: Runnable = object : Runnable {
             2-> return '2'
             1-> return '1'
             0-> return '0'
+            else->return '0'
         }
-        return '0'
     }
 
 
@@ -785,10 +736,9 @@ private val uiRunnable: Runnable = object : Runnable {
                     Log.d("onVerMac",wifi_ByteArray.toString())
                 }/////get version and mac
                 UUID.fromString(INFO_UUID)->{
+
                 }/////get info
-
             }
-
         }
 
 
@@ -830,11 +780,8 @@ private val uiRunnable: Runnable = object : Runnable {
 
                     /////get mac and version first
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
-
-
                     //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
                     /////get mac and version first
-
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
 
                 }///////send get mac first
@@ -918,6 +865,7 @@ private val uiRunnable: Runnable = object : Runnable {
             catch(e :Exception){
                 e.message?.let { Log.d("on notify", it) }
             }
+
 
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
                 Log.e("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
