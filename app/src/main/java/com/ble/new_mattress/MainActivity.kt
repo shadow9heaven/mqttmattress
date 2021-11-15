@@ -53,7 +53,9 @@ val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 ///////ble UUID
 
 ///////global flag
+
 var FLAG_WIFI_CONNECT = false
+var FLAG_MATTRESS_ACK = false
 
 ///////global flag
 
@@ -64,10 +66,7 @@ var bed_pressure = longArrayOf(
     0,0,0,0,0,
     0,0,0,0,0
 )
-
 //////////bed status
-
-
 //////global variable
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

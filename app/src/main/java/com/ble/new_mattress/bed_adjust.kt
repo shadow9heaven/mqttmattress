@@ -80,7 +80,6 @@ class bed_adjust : AppCompatActivity() {
 //////for mqtt protocol
 
 /////FLAG
-    var FLAG_MATTRESS_ACK = false
     var FLAG_MQTT_CONNECT = false
     var FLAG_CLICK_BED = false
 /////FLAG
@@ -104,6 +103,7 @@ class bed_adjust : AppCompatActivity() {
     lateinit var res_butt : TextView
 
     lateinit var tv_pressure : TextView
+    lateinit var tv_time :TextView
 ////number textview
 
 /////////////command
@@ -193,12 +193,38 @@ class bed_adjust : AppCompatActivity() {
     var set_rbutt = 2
 
     val progressdivide = 5
-
-    val queue_cmd : Queue<ByteArray> = LinkedList<ByteArray>(listOf())
+    var queue_cmd : Queue<ByteArray> = LinkedList<ByteArray>(listOf())
     var queue_retry = 0
 
 ////////runnable
 ///////////handler function
+    ////////command thread
+
+    private  val cmdthread :Thread = Thread{
+        while(FLAG_MQTT_CONNECT){
+            if(queue_cmd.size>0){
+                queue_retry++
+                if(queue_retry >3 || FLAG_MATTRESS_ACK){
+                    queue_cmd.poll()
+                    queue_retry = 0
+                    FLAG_MATTRESS_ACK = false
+                }
+                else {
+                    Log.d("cmdthread", "send command didn't get ack")
+                }
+
+
+            }////if queue has sth
+            else{
+
+            }
+            Thread.sleep(1000)
+        }
+    }
+
+////////command thread
+
+
 var uihandle = Handler()
 private val uiRunnable: Runnable = object : Runnable {
     override fun run(){
@@ -210,8 +236,17 @@ private val uiRunnable: Runnable = object : Runnable {
                     if(i%3  == 2)pressure_str += "\n"
                 }
 
+
+
                 pressure_str = pressure_str.dropLast(1)
-                tv_pressure.text = pressure_str
+                try{
+
+                    tv_pressure.text = pressure_str
+                    tv_time.text
+                }
+                catch(e:Exception){
+
+                }
             }
             else {
 
@@ -222,17 +257,7 @@ private val uiRunnable: Runnable = object : Runnable {
 }////uihandle?.postDelayed(uiRunnable, 0)///////run
     //// uihandle.removeCallbacks(uiRunnable)///stop
 
-////////command thread
 
-private  val cmdthread :Thread = Thread{
-    while(FLAG_MQTT_CONNECT){
-
-
-        Thread.sleep(1000)
-    }
-}
-
-////////command thread
 ///////////handler function
 
 ////////runnable
@@ -243,7 +268,10 @@ private  val cmdthread :Thread = Thread{
         Thread{
             mqttclass!!.connect(this, serverURL, mqttuser, mqttpwd)
             Thread.sleep(5000)
+            runOnUiThread{findviewID1()}
             mqttsub()
+            FLAG_MQTT_CONNECT = true
+            cmdthread.start()
         }.start()
     }
 
@@ -542,6 +570,9 @@ private  val cmdthread :Thread = Thread{
 
     }///////butt draggable
 
+    fun findloadview(){
+        setContentView(R.layout.loadingscreen)
+    }
 
     fun findviewID1(){
         //////////////////////findviewbyid
@@ -572,6 +603,7 @@ private  val cmdthread :Thread = Thread{
 //////////
 
         tv_pressure = findViewById(R.id.tv_pressure)
+        tv_time = findViewById(R.id.tv_time)
 
         res_head = findViewById(R.id.texthead)
         res_neck = findViewById(R.id.textneck)
@@ -645,10 +677,10 @@ private  val cmdthread :Thread = Thread{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        findloadview()
         extFile = File(storagePath, "command.txt")
         uihandle?.postDelayed(uiRunnable, 0)
-        findviewID1()
+
         if(ble_cnt){
             mgatt = bluetoothDevice.connectGatt(
                 applicationContext,
@@ -657,7 +689,9 @@ private  val cmdthread :Thread = Thread{
             )
 
         }
-
+        else{
+            findviewID1()
+        }
 
     }
 
@@ -675,6 +709,16 @@ private  val cmdthread :Thread = Thread{
         //if(BuildConfig.BUILD_TYPE == "debug")filePath += ".debug/"
         Runtime.getRuntime().exec(arrayOf("logcat", "-f", filePath, "*:D"))
         uihandle.removeCallbacks(uiRunnable)
+
+        FLAG_MQTT_CONNECT = false
+        /*
+        try{
+            cmdthread.interrupt()
+        }
+        catch(e : Exception){
+
+        }
+         */
 
     }
 

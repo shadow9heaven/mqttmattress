@@ -13,6 +13,7 @@ import MAVLink.bluetooth.msg_connect
 import MAVLink.bootloader.msg_bl_command
 import MAVLink.bootloader.msg_bl_ota
 import MAVLink.smartmattress.*
+import com.ble.new_mattress.FLAG_MATTRESS_ACK
 import com.ble.new_mattress.FLAG_WIFI_CONNECT
 import com.ble.new_mattress.bed_pressure
 
@@ -70,6 +71,8 @@ class MqttClass {
 
                         ////for smart ress
                         msg_mattress_ack.MAVLINK_MSG_ID_MATTRESS_ACK->{
+
+                            FLAG_MATTRESS_ACK = true
                             val respac : msg_mattress_ack  = msg_mattress_ack()
                             respac.unpack(parsertmp.payload)
                             val ack = respac.ack_code
