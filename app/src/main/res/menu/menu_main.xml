@@ -2,24 +2,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ble.mattress.MainActivity">
+    <!--
+    <item android:orderInCategory="100"
+    android:title="advanced mode"
+    app:showAsAction="never" />
+    -->
 
     <item
+        android:id = "@+id/options"
         android:orderInCategory="100"
-        android:title="advanced mode"
+        android:title="@string/options"
         app:showAsAction="never" />
-
-
     <item
         android:id="@+id/credit"
         android:orderInCategory="100"
-        android:title="credit"
+        android:title="@string/credit"
         app:showAsAction="never" />
 
 
     <item
         android:id="@+id/exit"
         android:orderInCategory="100"
-        android:title="exit"
+        android:title="@string/exit"
         app:showAsAction="never"
         />
 

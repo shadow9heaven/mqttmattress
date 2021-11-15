@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mattress</string>
+    <string name="connected">(connected)</string>
+    <string name="connect_alarm">device has connected</string>
+
+    <string name="back2title">back to title</string>
+
+    <string name="options">Options</string>
+    <string name="credit">Credit</string>
+    <string name="exit">Exit</string>
+    <!-- Strings used for fragments for navigation -->
+
+</resources>

@@ -420,9 +420,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.9"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.45"
+            app:layout_constraintTop_toBottomOf="@id/tv_time"
+            app:layout_constraintVertical_bias="0.02"
             />
+
         <TextView
             android:id="@+id/tv_time"
             android:layout_width="200dp"
@@ -434,8 +435,8 @@
             app:layout_constraintHorizontal_bias="0.9"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.6"
-            />
+            app:layout_constraintVertical_bias="0.3" />
+
         <ImageView
             android:id = "@+id/bed_icn"
             android:layout_width="18dp"
@@ -449,7 +450,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.95"
             app:srcCompat="@drawable/small_r" />
-
 
 
         <ImageView

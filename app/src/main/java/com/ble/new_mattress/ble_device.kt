@@ -40,6 +40,7 @@ class ble_device : AppCompatActivity() {
     private val listid = intArrayOf(android.R.id.text1, android.R.id.text2)
 
     //constant========================================
+
     //parameters======================================
     var FLAG_REFRESHING = false
     var device_connect = false

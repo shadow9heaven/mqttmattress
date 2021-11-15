@@ -193,7 +193,8 @@ class bed_adjust : AppCompatActivity() {
     var set_rbutt = 2
 
     val progressdivide = 5
-    var queue_cmd : Queue<ByteArray> = LinkedList<ByteArray>(listOf())
+    var queue_cmd : Queue<MqttMessage> = LinkedList<MqttMessage>(listOf())
+    var queue_resend = 0
     var queue_retry = 0
 
 ////////runnable
@@ -201,17 +202,31 @@ class bed_adjust : AppCompatActivity() {
     ////////command thread
 
     private  val cmdthread :Thread = Thread{
+
         while(FLAG_MQTT_CONNECT){
             if(queue_cmd.size>0){
-                queue_retry++
-                if(queue_retry >3 || FLAG_MATTRESS_ACK){
+                queue_resend++
+                if(queue_resend >3 && !FLAG_MATTRESS_ACK){
+                    /////need resend
+                    val thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+                    mqttclass!!.publish(thistopic, queue_cmd.first() , 1)
+                    queue_retry++
+
+                }////need resend
+                else if(FLAG_MATTRESS_ACK || queue_retry > 2){
                     queue_cmd.poll()
+                    if(queue_retry >2){
+                        Log.d("cmd_queue","send falied")
+                    }
+                    else{
+                        Log.d("cmd_queue","send success")
+                    }
+                    queue_resend = 0
                     queue_retry = 0
                     FLAG_MATTRESS_ACK = false
-                }
+                }////send success or give up
                 else {
-                    Log.d("cmdthread", "send command didn't get ack")
-                }
+                }///wait ack fail
 
 
             }////if queue has sth
@@ -223,7 +238,19 @@ class bed_adjust : AppCompatActivity() {
     }
 
 ////////command thread
+fun get_timer():String{
+    var tmp = ""
+    if(Date().hours<10) tmp += "0" + Date().hours.toString()+ ":"
+    else tmp += Date().hours.toString() +":"
 
+    if(Date().minutes<10) tmp += "0" + Date().minutes.toString()+ ":"
+    else tmp += Date().minutes.toString() +":"
+
+    if(Date().seconds<10) tmp += "0" + Date().seconds.toString()
+    else tmp += Date().seconds.toString()
+
+    return tmp
+}
 
 var uihandle = Handler()
 private val uiRunnable: Runnable = object : Runnable {
@@ -236,13 +263,11 @@ private val uiRunnable: Runnable = object : Runnable {
                     if(i%3  == 2)pressure_str += "\n"
                 }
 
-
-
                 pressure_str = pressure_str.dropLast(1)
                 try{
 
                     tv_pressure.text = pressure_str
-                    tv_time.text
+                    tv_time.text = get_timer()
                 }
                 catch(e:Exception){
 
@@ -284,6 +309,7 @@ private val uiRunnable: Runnable = object : Runnable {
     fun mqttpublish(com :ByteArray, msgid:Int) {
 
         var publishmsg : MqttMessage?= MqttMessage()
+
         var thistopic = ""
         publishmsg!!.setId(msgid)
         when(msgid){
@@ -366,7 +392,8 @@ private val uiRunnable: Runnable = object : Runnable {
 
 
         if (publishmsg != null) {
-            mqttclass!!.publish(thistopic, publishmsg , 1)
+            queue_cmd.add(publishmsg)////put into queue
+            //mqttclass!!.publish(thistopic, publishmsg , 1)///send command
         }
     }
 
