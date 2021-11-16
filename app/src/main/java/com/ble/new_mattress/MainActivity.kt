@@ -125,7 +125,8 @@ class MainActivity : AppCompatActivity() {
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
+
+            super.onCharacteristicWrite(gatt, characteristic, status)
             Log.e("onCharacteristicWrite",status.toString() +" :"+characteristic!!.uuid.toString())
 
         }
@@ -150,16 +151,18 @@ class MainActivity : AppCompatActivity() {
 
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if(newState == 2) {
-                gatt.discoverServices()
+            if(newState == 1 || newState == 2) {
+                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
                 }
+                else{
+                    gatt.discoverServices()
+                }
                 //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                 //String address = device.getAddress();
-                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
             }
             else if(newState ==0 || newState == 3){
                 broadcastUpdate(ACTION_GATT_DISCONNECTED)
@@ -258,34 +261,6 @@ class MainActivity : AppCompatActivity() {
             catch(e : java.lang.Exception){
                 e.message?.let { Log.d("on notify", it) }
             }
-            /*
-            try{
-                var notify_success2 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
-                if(notify_success2) Log.i("cDATAnotify", "Enable notify 2")
-                else Log.e("cVERMACnotify", "Fail to enable notify 2")
-
-            }
-            catch(e : java.lang.Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success3 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_INFO, true)
-                if(notify_success3) Log.i("cDATAnotify", "Enable notify 3")
-                else Log.e("cINFOnotify", "Fail to enable notify 3")
-
-            }
-            catch(e : java.lang.Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success4 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_COMMAND, true)
-                if(notify_success4) Log.i("cDATAnotify", "Enable notify 4")
-                else Log.e("cCOMMANDnotify", "Fail to enable notify 4")
-            }
-            catch(e : java.lang.Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-*/
 
 
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){

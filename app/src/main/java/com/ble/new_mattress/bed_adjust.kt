@@ -81,7 +81,6 @@ class bed_adjust : AppCompatActivity() {
 /////FLAG
 
 
-
     lateinit var extFile: File
     var soundexist: Boolean = false
 
@@ -223,7 +222,6 @@ class bed_adjust : AppCompatActivity() {
                 }////send success or give up
                 else {
                 }///wait ack fail
-
 
             }////if queue has sth
             else{
@@ -704,6 +702,9 @@ private val uiRunnable: Runnable = object : Runnable {
         uihandle?.postDelayed(uiRunnable, 0)
 
         if(ble_cnt){
+            mgatt!!.disconnect()
+            mgatt!!.close()
+
             mgatt = bluetoothDevice.connectGatt(
                 applicationContext,
                 false,

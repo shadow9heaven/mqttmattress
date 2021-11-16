@@ -35,9 +35,11 @@ class Options : AppCompatActivity() {
     val CMD_SET_SSID   = msg_wifi_set_ssid_password.MAVLINK_MSG_ID_WIFI_SET_SSID_PASSWORD              ///32
     val CMD_SET_IP_PWD = msg_mqtt_set_ip_password.MAVLINK_MSG_ID_MQTT_SET_IP_PASSWORD              ///33
 
+    /*
     val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
     val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
     val BA_mqttpassword = mqttpwd.toByteArray(Charsets.US_ASCII)
+    */
 
 
 
@@ -47,10 +49,19 @@ class Options : AppCompatActivity() {
 
         when(msgid){
             CMD_SET_SSID->{
-                val ssid = shortArrayOf()
-                val password = shortArrayOf()
-///////////////set ssid and password here///////////////////
+                val ssidstring = et_ssid.text.toString().toByteArray(Charsets.US_ASCII)
+                val pwdstring = et_wifipwd.text.toString().toByteArray(Charsets.US_ASCII)
 
+                var ssid = shortArrayOf()
+                var password = shortArrayOf()
+///////////////set ssid and password here///////////////////
+                for(i in 0..19){
+                    if(i< ssidstring.size) ssid = ssid.plus(ssidstring[i].toShort())
+                    else ssid = ssid.plus(0)
+
+                    if(i< password.size) password = password.plus(pwdstring[i].toShort())
+                    else ssid = ssid.plus(0)
+                }
 
 
 ///////////////////////////////////////////////////////////
@@ -62,9 +73,9 @@ class Options : AppCompatActivity() {
 
             }/////32 set wifi ssid
             CMD_SET_IP_PWD->{
-                val ipstring = mqttjson.getString("server")
-                val userstring = mqttjson.getString("mqttuser")
-                val pwdstring = mqttjson.getString("mqttpwd")
+                val ipstring = mqttjson.getString("server").toByteArray(Charsets.US_ASCII)
+                val userstring = mqttjson.getString("mqttuser").toByteArray(Charsets.US_ASCII)
+                val pwdstring = mqttjson.getString("mqttpwd").toByteArray(Charsets.US_ASCII)
 
                 var ip = shortArrayOf()
                 var user = shortArrayOf()
@@ -72,18 +83,18 @@ class Options : AppCompatActivity() {
 
 ////////////////////set ip user password here//////////////
                 for(i in 0..19){
-                    if(i< ipstring.length) ip = ip.plus(ipstring[i].toShort())
+                    if(i< ipstring.size) ip = ip.plus(ipstring[i].toShort())
                     else ip = ip.plus(0)
 
-                    if(i< userstring.length) user = user.plus(userstring[i].toShort())
+                    if(i< userstring.size) user = user.plus(userstring[i].toShort())
                     else user = user.plus(0)
 
-                    if(i<pwdstring.length) password = password.plus(pwdstring[i].toShort())
+                    if(i<pwdstring.size) password = password.plus(pwdstring[i].toShort())
                     else password = password.plus(0)
                 }
 
                 for(i in 20..29){
-                    if(i< ipstring.length) ip = ip.plus(ipstring[i].toShort())
+                    if(i< ipstring.size) ip = ip.plus(ipstring[i].toShort())
                     else ip =  ip.plus(0)
                 }
 ///////////////////////////////////////////////////////////
@@ -144,16 +155,12 @@ class Options : AppCompatActivity() {
     fun clickblereset(view: View) {
         try{
             blefile!!.delete()
+            Toast.makeText(this@Options, "ble device profile cleared, next time will not auto connect again!", Toast.LENGTH_SHORT).show()
         }
         catch(e :Exception){
             Log.e("options","didn't bond any device yet!")
         }
 
-        Toast.makeText(
-            this@Options,
-            "ble device profile cleared, next time will not auto connect again!",
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
 
@@ -162,6 +169,19 @@ class Options : AppCompatActivity() {
         startActivityForResult(intent, 99)
     }////call change server
 
+    fun clicksetssid(view: View) {
+        if(ble_cnt){
+            send_commandbyBle(CMD_SET_SSID)
+        }
+        else{
+            Toast.makeText(
+                this@Options,
+                "Not connect to ble device yet",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     fun clicksetserver(view: View) {
         if(ble_cnt){
             send_commandbyBle(CMD_SET_IP_PWD)
@@ -169,7 +189,7 @@ class Options : AppCompatActivity() {
         else{
             Toast.makeText(
                 this@Options,
-                "Not connect to ble yet",
+                "Not connect to ble device yet",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -197,4 +217,5 @@ class Options : AppCompatActivity() {
 
         }
     }
+
 }
