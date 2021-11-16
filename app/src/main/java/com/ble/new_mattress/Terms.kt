@@ -23,12 +23,11 @@ class Terms : AppCompatActivity() {
         term_text = findViewById(R.id.term_text)
 
         try {
+
             reader =BufferedReader(InputStreamReader(getAssets().open("flasknote.txt"), "UTF-8"))
 
             // do reading, usually loop until end of file reading
             //reader.lines()
-
-
 
             mLine = reader.readLine()
             while (mLine != null) {
@@ -41,9 +40,7 @@ class Terms : AppCompatActivity() {
                 }
             }
 
-
             term_text.text = termbuffer
-
 
         } catch (e : IOException) {
             //log the exception
@@ -52,6 +49,7 @@ class Terms : AppCompatActivity() {
                 try {
                     reader.close();
                 } catch (e :IOException) {
+
                     //log the exception
                 }
             }

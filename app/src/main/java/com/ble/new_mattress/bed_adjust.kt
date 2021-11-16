@@ -60,14 +60,10 @@ class bed_adjust : AppCompatActivity() {
     val TAG = "bed_adjust"
     var mqttclass : MqttClass? = MqttClass()
 
-    val serverURL = "tcp://114.34.221.116:6673"
-    val mqttuser  = "smartmattress"
-    val mqttpwd =   "aRkZQwD4"
 
 
-    val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
-    val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
-    val BA_mqttpassword = mqttpwd.toByteArray(Charsets.US_ASCII)
+
+
 
     val topic1 = "smttrss"
 
@@ -701,7 +697,6 @@ private val uiRunnable: Runnable = object : Runnable {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         findloadview()
@@ -714,12 +709,10 @@ private val uiRunnable: Runnable = object : Runnable {
                 false,
                 gattCallback
             )
-
         }
         else{
             findviewID1()
         }
-
     }
 
     override fun onDestroy() {
@@ -851,13 +844,28 @@ private val uiRunnable: Runnable = object : Runnable {
             Log.e("DW", descriptor.toString())
             ////send connect both device
             when(descriptor){
-                CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
-
-                    /////get mac and version first
+                CHARACTERISTIC_DATA!!.getDescriptors().first()->{
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
+                }
+                CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
+                    for (dp in CHARACTERISTIC_DATA!!.getDescriptors()){
+                        Log.i("CHARACTERISTIC_INFO", "dp:" + dp.toString())
+                        if (dp != null) {
+                            if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                                dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                            else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                                dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                            }
+                            var tmp = mgatt!!.writeDescriptor(dp)
+                            Log.e("response",tmp.toString())
+                        }
+                    }
+                    /////get mac and version first
+
 
                 }///////send get mac first
                 CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{

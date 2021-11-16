@@ -28,7 +28,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mattress">
-        <activity android:name=".Options"></activity>
+        <activity android:name=".change_new_server"></activity>
+        <activity android:name=".Options" />
         <activity
             android:name=".bed_adjust"
             android:screenOrientation="landscape"

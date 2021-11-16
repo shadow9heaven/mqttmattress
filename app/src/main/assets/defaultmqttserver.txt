@@ -1,0 +1,3 @@
+tcp://114.34.221.116:6673
+smartmattress
+aRkZQwD4
