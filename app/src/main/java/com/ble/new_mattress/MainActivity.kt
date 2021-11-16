@@ -111,24 +111,22 @@ class MainActivity : AppCompatActivity() {
 
 
     private val gattCallback = object : BluetoothGattCallback() {
-
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
+            //super.onCharacteristicRead(gatt, characteristic, status)
             Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
         }
+
         override fun onCharacteristicWrite(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-
-            super.onCharacteristicWrite(gatt, characteristic, status)
+            //super.onCharacteristicWrite(gatt, characteristic, status)
             Log.e("onCharacteristicWrite",status.toString() +" :"+characteristic!!.uuid.toString())
-
         }
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt?,
@@ -152,6 +150,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 1 || newState == 2) {
+                val result = gatt.requestMtu(256)
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
@@ -187,27 +186,41 @@ class MainActivity : AppCompatActivity() {
             ////send connect both device
             when(descriptor){
                 CHARACTERISTIC_DATA!!.getDescriptors().first()->{
+                    val dp = CHARACTERISTIC_DATA!!.getDescriptors().last()
+                    Log.i("CHARACTERISTIC_DATA-2", "dp:" + dp.toString())
+                    if (dp != null) {
+                        if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                            dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        }
+                        else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                            dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        }
+                        var tmp = mgatt!!.writeDescriptor(dp)
+                        Log.e("response",tmp.toString())
+                    }
+
+                }
+                CHARACTERISTIC_DATA!!.getDescriptors().last()-> {
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
-                }
+                }/////get mac and version first
                 CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
-                    for (dp in CHARACTERISTIC_DATA!!.getDescriptors()){
-                        Log.i("CHARACTERISTIC_INFO", "dp:" + dp.toString())
-                        if (dp != null) {
-                            if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
-                                dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                            }
-                            else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
-                                dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                            }
-                            var tmp = mgatt!!.writeDescriptor(dp)
-                            Log.e("response",tmp.toString())
+                    val dp = CHARACTERISTIC_DATA!!.getDescriptors().first()
+                    Log.i("CHARACTERISTIC_DATA-1", "dp:" + dp.toString())
+                    if (dp != null) {
+                        if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                            dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                         }
+                        else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                            dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        }
+                        var tmp = mgatt!!.writeDescriptor(dp)
+                        Log.e("response",tmp.toString())
                     }
-                    /////get mac and version first
 
+                    /////get mac and version first
                 }///////send get mac first
                 CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{
                     for (dp in CHARACTERISTIC_INFO!!.getDescriptors()){
@@ -227,13 +240,16 @@ class MainActivity : AppCompatActivity() {
                 CHARACTERISTIC_INFO!!.getDescriptors().last()->{
                     for (dp in CHARACTERISTIC_COMMAND!!.getDescriptors()) {
                         Log.i("CHARACTERISTIC_COMMAND", "dp:" + dp.toString())
+
                         if (dp != null) {
+
                             if(CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
                                 dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                             }
                             else if (CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
                                 dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
                             }
+
                             var tmp = mgatt!!.writeDescriptor(dp)
                             Log.e("response",tmp.toString())
                         }
@@ -247,9 +263,9 @@ class MainActivity : AppCompatActivity() {
 
             Service_UART = gatt!!.getService(UUID.fromString(SMARTMATTRESS_UUID))
             // Get Characteristic
-            CHARACTERISTIC_DATA = Service_UART!!.getCharacteristic(UUID.fromString(DATA_UUID))
-            CHARACTERISTIC_VER_MAC  = Service_UART!!.getCharacteristic(UUID.fromString(VER_MAC_UUID))
-            CHARACTERISTIC_INFO = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
+            CHARACTERISTIC_DATA       = Service_UART!!.getCharacteristic(UUID.fromString(DATA_UUID))
+            CHARACTERISTIC_VER_MAC    = Service_UART!!.getCharacteristic(UUID.fromString(VER_MAC_UUID))
+            CHARACTERISTIC_INFO       = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
             CHARACTERISTIC_COMMAND    = Service_UART!!.getCharacteristic(UUID.fromString(COMMAND_UUID))
 
             // Enable Notify
@@ -324,6 +340,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         findview()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            Log.e("Permission", "Request External Storage")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                9
+            )
+        }
+        else{
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    18
+                )
+            }
+            else{
+                opentermsActivity()
+            }
+        }
+
         storagePath = this.getExternalFilesDir(null)
         blefile = File(storagePath, blefilename)
         var mqttfile = File(storagePath,mqttserverfile)
@@ -388,28 +427,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
-            Log.e("Permission", "Request External Storage")
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                9
-            )
-        }
-        else{
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    18
-                )
-            }
-            else{
-                    opentermsActivity()
-            }
-        }
+
     }
 
     override fun onDestroy() {

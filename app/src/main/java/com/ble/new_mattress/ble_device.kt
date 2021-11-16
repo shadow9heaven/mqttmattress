@@ -254,58 +254,75 @@ class ble_device : AppCompatActivity() {
             Log.e("Scan Failed", "Error Code: $errorCode")
         }
     }
-
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
-            Log.e("onCharacteristicRead",status.toString() +" :"+characteristic!!.uuid.toString())
+            //super.onCharacteristicRead(gatt, characteristic, status)
+            Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
         }
+
         override fun onCharacteristicWrite(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
+            //super.onCharacteristicWrite(gatt, characteristic, status)
             Log.e("onCharacteristicWrite",status.toString() +" :"+characteristic!!.uuid.toString())
         }
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ){
+            val data = characteristic!!.value
+            Log.e("onCharacteristicChanged",characteristic.uuid.toString())
+
+            when(characteristic.uuid){
+
+                UUID.fromString(VER_MAC_UUID)->{
+                    var wifi_ByteArray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
+                    Log.d("onVerMac",wifi_ByteArray.toString())
+                }/////get version and mac
+                UUID.fromString(INFO_UUID)->{
+
+                }/////get info
+            }
+        }
+
+
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if(newState == 2|| newState == 3) {
-                //gatt.discoverServices()
+            if(newState == 1 || newState == 2) {
+                val result = gatt.requestMtu(256)
+                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
                 }
-
-
+                else{
+                    gatt.discoverServices()
+                }
+                //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                 //String address = device.getAddress();
-                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
-
-                try {
-                    when (newState) {
-                        BluetoothProfile.STATE_DISCONNECTED -> {
-                            broadcastUpdate(ACTION_GATT_DISCONNECTED, bleaddress, status);
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace();
-                }
-
+            }
+            else if(newState ==0 || newState == 3){
+                broadcastUpdate(ACTION_GATT_DISCONNECTED)
+                ble_cnt = false
             }
         }
 
         override fun onDescriptorRead(
-                gatt: BluetoothGatt?,
-                descriptor: BluetoothGattDescriptor?,
-                status: Int
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
         ) {
             super.onDescriptorRead(gatt, descriptor, status)
-
+            Log.e("DR", gatt.toString())
+            Log.e("DR", descriptor.toString())
         }
+
         override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
             Log.e("DW", gatt.toString())
@@ -313,34 +330,76 @@ class ble_device : AppCompatActivity() {
             ////send connect both device
             when(descriptor){
                 CHARACTERISTIC_DATA!!.getDescriptors().first()->{
+                    val dp = CHARACTERISTIC_DATA!!.getDescriptors().last()
+                    Log.i("CHARACTERISTIC_DATA-2", "dp:" + dp.toString())
+                    if (dp != null) {
+                        if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                            dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        }
+                        else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                            dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        }
+                        var tmp = mgatt!!.writeDescriptor(dp)
+                        Log.e("response",tmp.toString())
+                    }
 
-                    //mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
+                }
+                CHARACTERISTIC_DATA!!.getDescriptors().last()-> {
+                    mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
-
-                }///////send get mac first
+                }/////get mac and version first
                 CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
+                    val dp = CHARACTERISTIC_DATA!!.getDescriptors().first()
+                    Log.i("CHARACTERISTIC_DATA-1", "dp:" + dp.toString())
+                    if (dp != null) {
+                        if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                            dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        }
+                        else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                            dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        }
+                        var tmp = mgatt!!.writeDescriptor(dp)
+                        Log.e("response",tmp.toString())
+                    }
 
-                }////////get data descriptor after command mac
+                    /////get mac and version first
+                }///////send get mac first
+                CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{
+                    for (dp in CHARACTERISTIC_INFO!!.getDescriptors()){
+                        Log.i("CHARACTERISTIC_INFO", "dp:" + dp.toString())
+                        if (dp != null) {
+                            if(CHARACTERISTIC_INFO!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                                dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                            else if (CHARACTERISTIC_INFO!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                                dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                            }
+                            var tmp = mgatt!!.writeDescriptor(dp)
+                            Log.e("response",tmp.toString())
+                        }
+                    }
+                }////////get info descriptor after ver mac
                 CHARACTERISTIC_INFO!!.getDescriptors().last()->{
                     for (dp in CHARACTERISTIC_COMMAND!!.getDescriptors()) {
                         Log.i("CHARACTERISTIC_COMMAND", "dp:" + dp.toString())
+
                         if (dp != null) {
+
                             if(CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
                                 dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                             }
                             else if (CHARACTERISTIC_COMMAND!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
                                 dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
                             }
+
                             var tmp = mgatt!!.writeDescriptor(dp)
                             Log.e("response",tmp.toString())
                         }
                     }////command descriptors
                 }//////get commmand descriptor after info
             }
-
-
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
@@ -353,57 +412,16 @@ class ble_device : AppCompatActivity() {
             CHARACTERISTIC_INFO       = Service_UART!!.getCharacteristic(UUID.fromString(INFO_UUID))
             CHARACTERISTIC_COMMAND    = Service_UART!!.getCharacteristic(UUID.fromString(COMMAND_UUID))
 
-            for (dp in CHARACTERISTIC_DATA!!.getDescriptors()){
-                Log.i("CHARACTERISTIC_DATA", "dp:" + dp.toString())
-                if (dp != null) {
-                    if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
-                        dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    }
-                    else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
-                        dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    }
-                    var tmp = mgatt!!.writeDescriptor(dp)
-                    Log.e("response",tmp.toString())
-                }
-            } /////get mac and version first
-
             // Enable Notify
             try{
                 var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_DATA, true)
                 if(notify_success) Log.i("cDATAnotify", "Enable notify 1")
                 else Log.e("cDATAnotify", "Fail to enable notify 1")
             }
-            catch(e :Exception){
+            catch(e : java.lang.Exception){
                 e.message?.let { Log.d("on notify", it) }
             }
-            /*
-            try{
-                var notify_success2 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
-                if(notify_success2) Log.i("cDATAnotify", "Enable notify 2")
-                else Log.e("cVERMACnotify", "Fail to enable notify 2")
 
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success3 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_INFO, true)
-                if(notify_success3) Log.i("cDATAnotify", "Enable notify 3")
-                else Log.e("cINFOnotify", "Fail to enable notify 3")
-
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success4 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_COMMAND, true)
-                if(notify_success4) Log.i("cDATAnotify", "Enable notify 4")
-                else Log.e("cCOMMANDnotify", "Fail to enable notify 4")
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-*/
 
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
                 Log.e("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
@@ -427,7 +445,7 @@ class ble_device : AppCompatActivity() {
 
 
 
-    private fun broadcastUpdate(action: String, address_connected: String, status: Int) {
+    private fun broadcastUpdate(action: String) {
         val intent = Intent(action)
         sendBroadcast(intent)
     }

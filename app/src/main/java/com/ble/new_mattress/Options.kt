@@ -34,7 +34,9 @@ class Options : AppCompatActivity() {
 
     val CMD_SET_SSID   = msg_wifi_set_ssid_password.MAVLINK_MSG_ID_WIFI_SET_SSID_PASSWORD              ///32
     val CMD_SET_IP_PWD = msg_mqtt_set_ip_password.MAVLINK_MSG_ID_MQTT_SET_IP_PASSWORD              ///33
-
+    val CMD_SET_WIFI_CONNECT = msg_connect.MAVLINK_MSG_ID_CONNECT    ///34
+    var wifi_ssid = "biologue"
+    var wifi_pwd = "6688436"
     /*
     val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
     val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
@@ -59,11 +61,9 @@ class Options : AppCompatActivity() {
                     if(i< ssidstring.size) ssid = ssid.plus(ssidstring[i].toShort())
                     else ssid = ssid.plus(0)
 
-                    if(i< password.size) password = password.plus(pwdstring[i].toShort())
-                    else ssid = ssid.plus(0)
+                    if(i< pwdstring.size) password = password.plus(pwdstring[i].toShort())
+                    else password = password.plus(0)
                 }
-
-
 ///////////////////////////////////////////////////////////
                 if(ssid.size == 20 && password.size == 20){
                     val cmdconstructor =  msg_wifi_set_ssid_password(ssid,password)
@@ -105,6 +105,10 @@ class Options : AppCompatActivity() {
                 else return false
 
             }/////33 set mqtt ip password
+            CMD_SET_WIFI_CONNECT->{
+                val cmdconstructor =  msg_connect(3.toShort())
+                mavpac = cmdconstructor.pack().encodePacket()
+            }//////34 reconnect wifi router and mqttbroker
         }
         Log.d("sendcommand mavlink",mavpac.toString())
 
@@ -113,16 +117,13 @@ class Options : AppCompatActivity() {
             while(!ch_cmd) {
                 CHARACTERISTIC_COMMAND?.setValue(mavpac)
                 ch_cmd = mgatt!!.writeCharacteristic(CHARACTERISTIC_COMMAND)
-
                 if (ch_cmd) {
                     Log.e("sendcommand", "start_send")
-                    //PlotThread.start()
                 }
                 else {
                     Log.e("sendcommand", "start_sendfailed!!")
                     Thread.sleep(200)
                 }
-
             }
             return true
         }
@@ -143,8 +144,8 @@ class Options : AppCompatActivity() {
         et_ssid = findViewById(R.id.et_ssid)
         et_wifipwd = findViewById(R.id.et_wifipwd)
 
-        et_ssid.setText(mqttjson.getString("server"))
-        et_wifipwd.setText(mqttjson.getString("mqttuser"))
+        et_ssid.setText(wifi_ssid)
+        et_wifipwd.setText(wifi_pwd)
 
         tv_connected_device.text = SavedBleAddr
         tv_serverip.text = mqttjson.getString("server")
@@ -163,15 +164,14 @@ class Options : AppCompatActivity() {
 
     }
 
-
     fun clickserversetting(view: View) {
         val intent = Intent(this, change_new_server::class.java)
         startActivityForResult(intent, 99)
     }////call change server
 
-    fun clicksetssid(view: View) {
+    fun clickreconnect(view: View) {
         if(ble_cnt){
-            send_commandbyBle(CMD_SET_SSID)
+            send_commandbyBle(CMD_SET_WIFI_CONNECT)
         }
         else{
             Toast.makeText(
@@ -194,7 +194,18 @@ class Options : AppCompatActivity() {
             ).show()
         }
     }////click ble set to new server
-
+    fun clicksetssid(view: View) {
+        if(ble_cnt){
+            send_commandbyBle(CMD_SET_SSID)
+        }
+        else{
+            Toast.makeText(
+                this@Options,
+                "Not connect to ble device yet",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }////click ble set to new wifi
     fun clickback(view: View) {
         setResult(RESULT_OK)
         finish()
@@ -217,5 +228,7 @@ class Options : AppCompatActivity() {
 
         }
     }
+
+
 
 }

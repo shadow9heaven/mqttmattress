@@ -813,6 +813,7 @@ private val uiRunnable: Runnable = object : Runnable {
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 2) {
+                val result = gatt.requestMtu(256)
                 gatt.discoverServices()
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
