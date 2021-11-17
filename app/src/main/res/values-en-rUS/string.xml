@@ -6,6 +6,10 @@
 
     <string name="back2title">back to title</string>
 
+    <string name="adjust_hard">adjust</string>
+    <string name="relieve_stress">reli</string>
+    <string name="meditation">medi</string>
+
     <string name="options">Options</string>
     <string name="credit">Credit</string>
     <string name="exit">Exit</string>

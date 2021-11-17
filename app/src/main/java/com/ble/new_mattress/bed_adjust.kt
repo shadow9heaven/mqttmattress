@@ -62,10 +62,6 @@ class bed_adjust : AppCompatActivity() {
     var mqttclass : MqttClass? = MqttClass()
 
 
-
-
-
-
     val topic1 = "smttrss"
 
     val topic2 = arrayOf("control","sensor","ack","err","config","model","ota","else")
@@ -79,6 +75,7 @@ class bed_adjust : AppCompatActivity() {
 /////FLAG
     var FLAG_MQTT_CONNECT = false
     var FLAG_CLICK_BED = false
+    var FLAG_AUTO_TUNE = false
 /////FLAG
 
 
@@ -125,13 +122,9 @@ class bed_adjust : AppCompatActivity() {
 
 /////cohe timer
 
-
-
 ////airbag connect
 
 ////airbag connect
-
-
 
 //////cade on off
     var cade_1 = 0.toShort()
@@ -405,7 +398,6 @@ private val uiRunnable: Runnable = object : Runnable {
         mqttclass!!.unsubscribe("#")
     }
     /////mqtt function
-
 
     fun change_time(sec:Int) : String{
         if(sec % 60 >9)return (sec/60).toString() +":"+ (sec % 60).toString()
@@ -983,6 +975,15 @@ private val uiRunnable: Runnable = object : Runnable {
         }
     }
 
+/////////relieve mode
+    fun clickreli(view: View) {
+
+    }
+
+
+
+/////////relieve mode
+
     fun clickmenu(view: View) {
         ////menu
         val popupMenu = PopupMenu(this, view)
@@ -1141,7 +1142,7 @@ private val uiRunnable: Runnable = object : Runnable {
         sendBroadcast(intent)
 
     }
-
+////////click fragment change
     fun clicktrans1(view: View) {
         mode = "cohe"
         findviewID1()
@@ -1155,5 +1156,9 @@ private val uiRunnable: Runnable = object : Runnable {
         mode = "medi"
         findviewID3()
     }
+////////click fragment change
+
+
+
 
 }

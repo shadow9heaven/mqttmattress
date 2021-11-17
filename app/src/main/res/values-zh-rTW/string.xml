@@ -6,6 +6,10 @@
 
     <string name="back2title">返回主畫面</string>
 
+    <string name="adjust_hard">調整</string>
+    <string name="relieve_stress">舒壓</string>
+    <string name="meditation">冥想</string>
+
     <string name="options">選項</string>
     <string name="credit">關於app</string>
     <string name="exit">離開</string>

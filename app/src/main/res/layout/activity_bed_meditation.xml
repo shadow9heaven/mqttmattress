@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:translationX="-100dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
@@ -35,36 +36,79 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5"
             >
-            <ImageButton
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:translationX="-150dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                app:srcCompat="@drawable/coherent_m_button_off"
-                />
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="clicktrans1"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/meditation_m_button_off"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/adjust_hard"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/purple_500"
+                    android:layout_gravity="right|center_vertical"
+                    android:translationX="-5dp"
+                    />
+            </FrameLayout>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-            <ImageButton
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:onClick="clickcadence1"
+                    app:srcCompat="@drawable/meditation_m_button_off"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/relieve_stress"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/purple_500"
+                    android:layout_gravity="right|center_vertical"
+                    android:translationX="-5dp"
+                    />
+            </FrameLayout>
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:translationX="-150dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:onClick="clickcadence1"
-                app:srcCompat="@drawable/cadence_m_button_off"
-                />
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:translationX="-150dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:onClick="clickmedi1"
-                app:srcCompat="@drawable/meditation_m_button_on"
-                />
+                >
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:onClick="clickmedi1"
+                    app:srcCompat="@drawable/meditation_m_button_on"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/meditation"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:layout_gravity="right|center_vertical"
+                    android:translationX="-5dp"
+                    />
+            </FrameLayout>
         </LinearLayout>
 
 

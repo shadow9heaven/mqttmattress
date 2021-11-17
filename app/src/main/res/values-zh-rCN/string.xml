@@ -6,6 +6,10 @@
 
     <string name="back2title">返回主画面</string>
 
+    <string name="adjust_hard">调整</string>
+    <string name="relieve_stress">舒压</string>
+    <string name="meditation">冥想</string>
+
     <string name="options">Options</string>
     <string name="credit">Credit</string>
     <string name="exit">Exit</string>
