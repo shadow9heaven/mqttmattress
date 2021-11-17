@@ -188,7 +188,9 @@ class bed_adjust : AppCompatActivity() {
     var set_rweist = 2
     var set_rbutt = 2
 
+
     val progressdivide = 5
+
     var queue_cmd : Queue<MqttMessage> = LinkedList<MqttMessage>(listOf())
     var queue_resend = 0
     var queue_retry = 0
@@ -246,6 +248,7 @@ fun get_timer():String{
 
     return tmp
 }
+
 
 var uihandle = Handler()
 private val uiRunnable: Runnable = object : Runnable {
@@ -476,7 +479,8 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            current_head = progress / progressdivide
+            current_head = (progress / progressdivide)
+            if(current_head>0) current_head -= 1
             num_head.text = "$current_head"
         }
     }////////head draggable
@@ -498,7 +502,8 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             //if(mode == "cohe") {
             current_neck = progress /progressdivide
-            //set_neck = current_neck
+            if(current_neck>0) current_neck -= 1
+
             num_neck.text = "$current_neck"
 
             //}
@@ -521,7 +526,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_shoulder = progress / progressdivide
-                sb_shoulder?.setProgress(progress)
+                if(current_shoulder>0) current_shoulder -= 1
                 num_shoulder.text = "$current_shoulder"
 
 
@@ -544,6 +549,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_back = progress / progressdivide
+                if(current_back>0) current_back -= 1
                 num_back.text = "$current_back"
 
 
@@ -565,6 +571,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_weist = progress / progressdivide
+                if(current_weist>0) current_weist -= 1
                 num_weist.text = "$current_weist"
 
         }
@@ -586,6 +593,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
 
                 current_butt = progress / progressdivide
+                if(current_butt>0) current_butt -= 1
                 num_butt.text = "$current_butt"
 
         }

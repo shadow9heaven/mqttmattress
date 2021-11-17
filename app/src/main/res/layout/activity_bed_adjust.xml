@@ -42,373 +42,358 @@
             app:srcCompat="@drawable/bed" />
 
         <LinearLayout
-            android:id = "@+id/ll_part1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.19"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical"
-            android:contextClickable="false"
+
+            android:orientation="horizontal"
             >
-            <TextView
-                android:id="@+id/num_head"
-                android:layout_width="match_parent"
+
+            <LinearLayout
+                android:id = "@+id/ll_part1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:text="1"
-                />
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:layout_marginRight="40dp"
+                android:orientation="vertical"
+                android:contextClickable="false"
                 >
-                <SeekBar
-                    android:id="@+id/wb_head"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false"
-                    android:foregroundGravity="left"
+                <TextView
+                    android:id="@+id/num_head"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="1"
+                    />
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
                     android:layout_gravity="center"
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_head"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false"
+                        android:foregroundGravity="left"
+                        android:layout_gravity="center"
+                        />
+
+                    <SeekBar
+                        android:id="@+id/sb_head"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:rotation="270"
+                        android:layout_gravity="center"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+
+                        android:progress="10"
+                        />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/texthead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textStyle="bold"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id = "@+id/ll_part2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/num_neck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity = "center"
+                    android:text="1" />
+
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_neck"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false"
+                        android:layout_gravity="center"
+                        />
+
+                    <SeekBar
+                        android:id="@+id/sb_neck"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progress="10" />
+
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/textneck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:gravity = "center"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id = "@+id/ll_part3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/num_shoulder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity = "center"
+                    android:text="1"
                     />
 
-                <SeekBar
-                    android:id="@+id/sb_head"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:rotation="270"
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
                     android:layout_gravity="center"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_shoulder"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false" />
+                    <SeekBar
+                        android:id="@+id/sb_shoulder"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progress="10" />
+                </FrameLayout>
 
-                    android:progress="10"
+                <TextView
+                    android:id="@+id/textshoulder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="3"
+                    android:gravity = "center"
+                    android:textStyle="bold"
                     />
-            </FrameLayout>
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/texthead"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id = "@+id/ll_part4"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="1"
-                android:textStyle="bold"
-             />
-        </LinearLayout>
+                android:layout_marginRight="40dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/num_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity = "center"
+                    android:text="1" />
 
-        <LinearLayout
-            android:id = "@+id/ll_part2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.256"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/num_neck"
-                android:layout_width="match_parent"
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_back"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_centerInParent="true"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false"/>
+                    <SeekBar
+                        android:id="@+id/sb_back"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_centerInParent="true"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progress="10" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/textback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    android:gravity = "center"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id = "@+id/ll_part5"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity = "center"
-                android:text="1" />
+                android:layout_marginRight="40dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/num_weist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="1" />
 
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_weist"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_centerInParent="true"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false" />
+                    <SeekBar
+                        android:id="@+id/sb_weist"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_centerInParent="true"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progress="10" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/textweist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity = "center"
+                    android:text="5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id = "@+id/ll_part6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+
+                android:orientation="vertical"
+                android:contextClickable="false"
                 >
-                <SeekBar
-                    android:id="@+id/wb_neck"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false"
+                <TextView
+                    android:id="@+id/num_butt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textStyle="bold" />
+                <FrameLayout
+                    android:layout_height="300dp"
+                    android:layout_width="40dp"
+                    android:orientation="horizontal"
                     android:layout_gravity="center"
-                    />
+                    android:gravity="center"
+                    >
+                    <SeekBar
+                        android:id="@+id/wb_butt"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:rotation="270"
+                        android:progress="10"
+                        android:saveEnabled="false" />
+                    <SeekBar
+                        android:id="@+id/sb_butt"
+                        style="@android:style/Widget.Material.Light.SeekBar"
+                        android:layout_width="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:progress="10"/>
 
-                <SeekBar
-                    android:id="@+id/sb_neck"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:rotation="270"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progress="10" />
+                </FrameLayout>
 
-            </FrameLayout>
-            <TextView
-                android:id="@+id/textneck"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="2"
-                android:gravity = "center"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id = "@+id/ll_part3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.342"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/num_shoulder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity = "center"
-                android:text="1"
-                />
-
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
-                >
-                <SeekBar
-                    android:id="@+id/wb_shoulder"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false" />
-                <SeekBar
-                    android:id="@+id/sb_shoulder"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:rotation="270"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progress="10" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/textshoulder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="3"
-                android:gravity = "center"
-                android:textStyle="bold"
-             />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id = "@+id/ll_part4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.427"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/num_back"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity = "center"
-                android:text="1" />
-
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
-                >
-                <SeekBar
-                    android:id="@+id/wb_back"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false"/>
-                <SeekBar
-                    android:id="@+id/sb_back"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:rotation="270"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progress="10" />
-
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/textback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="4"
-                android:gravity = "center"
-                android:textStyle="bold" />
-        </LinearLayout>
-        <LinearLayout
-            android:id = "@+id/ll_part5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8"
-
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/num_weist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:text="1" />
-
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
-                >
-                <SeekBar
-                    android:id="@+id/wb_weist"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false" />
-                <SeekBar
-                    android:id="@+id/sb_weist"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:rotation="270"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progress="10" />
-
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/textweist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity = "center"
-                android:text="5" />
+                <TextView
+                    android:id="@+id/textbutt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity = "center"
+                    android:text="6" />
+            </LinearLayout>
         </LinearLayout>
 
 
-        <LinearLayout
-            android:id = "@+id/ll_part6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.585"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8"
-            android:orientation="vertical"
-            android:contextClickable="false"
-            >
-            <TextView
-                android:id="@+id/num_butt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="1"
-                android:textStyle="bold" />
-            <FrameLayout
-                android:layout_height="300dp"
-                android:layout_width="40dp"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:gravity="center"
-                >
-                <SeekBar
-                    android:id="@+id/wb_butt"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:rotation="270"
-                    android:progress="10"
-                    android:saveEnabled="false" />
-                <SeekBar
-                    android:id="@+id/sb_butt"
-                    style="@android:style/Widget.Material.Light.SeekBar"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:rotation="270"
-                    android:thumb="@drawable/bar_thumb"
-                    android:progressDrawable="@drawable/draw_seekbar"
-                    android:maxHeight="3dp"
-                    android:minHeight="3dp"
-                    android:progress="10"/>
-
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/textbutt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity = "center"
-                android:text="6" />
-        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_pressure"
@@ -483,14 +468,11 @@
             app:srcCompat="@drawable/bed_right"
             />
 
-        <ImageButton
+        <LinearLayout
+            android:id = "@+id/ll_modechange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:translationX="-150dp"
-            android:background="@android:color/transparent"
-
-            app:srcCompat="@drawable/coherent_m_button_on"
-
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
@@ -498,40 +480,42 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.2" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:translationX="-150dp"
-            android:background="@android:color/transparent"
-            android:onClick="clickcadence1"
+            app:layout_constraintVertical_bias="0.5"
+            >
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationX="-150dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/coherent_m_button_on"
+                />
 
-            app:srcCompat="@drawable/cadence_m_button_off"
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationX="-150dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:onClick="clickcadence1"
+                app:srcCompat="@drawable/cadence_m_button_off"
+                />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationX="-150dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:onClick="clickmedi1"
+                app:srcCompat="@drawable/meditation_m_button_off"
+                />
+        </LinearLayout>
 
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:translationX="-150dp"
-            android:background="@android:color/transparent"
-            android:onClick="clickmedi1"
-            app:srcCompat="@drawable/meditation_m_button_off"
 
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.8" />
+
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="wrap_content"
