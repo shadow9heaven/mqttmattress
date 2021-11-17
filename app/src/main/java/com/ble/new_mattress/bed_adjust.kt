@@ -31,6 +31,7 @@ import android.os.Environment
 import android.view.WindowManager
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import java.lang.Exception
+import java.lang.Thread.sleep
 
 @ExperimentalUnsignedTypes
 class bed_adjust : AppCompatActivity() {
@@ -704,12 +705,13 @@ private val uiRunnable: Runnable = object : Runnable {
         if(ble_cnt){
             mgatt!!.disconnect()
             mgatt!!.close()
-
+            sleep(500)
             mgatt = bluetoothDevice.connectGatt(
                 applicationContext,
                 false,
                 gattCallback
             )
+            findviewID1()
         }
         else{
             findviewID1()
@@ -924,6 +926,7 @@ private val uiRunnable: Runnable = object : Runnable {
             catch(e :Exception){
                 e.message?.let { Log.d("on notify", it) }
             }
+
             try{
                 var notify_success2 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
                 if(notify_success2) Log.i("cDATAnotify", "Enable notify 2")

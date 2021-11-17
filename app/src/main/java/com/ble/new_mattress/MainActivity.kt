@@ -360,9 +360,12 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 opentermsActivity()
+                mainsetting()
             }
         }
+    }
 
+    fun mainsetting(){
         storagePath = this.getExternalFilesDir(null)
         blefile = File(storagePath, blefilename)
         var mqttfile = File(storagePath,mqttserverfile)
@@ -391,9 +394,6 @@ class MainActivity : AppCompatActivity() {
             mqttjson.put("mqttpwd", mqttlist[2])
             mqttfile.appendText(mqttjson.toString() + "\n")
         }
-
-
-
 
         try{
             bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -425,16 +425,17 @@ class MainActivity : AppCompatActivity() {
         catch (e: Exception){
             Log.d("readble", e.message!!)
         }
+    }
 
-
+    fun blesetting(){
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
         broadcastUpdate(ACTION_GATT_DISCONNECTED)
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -476,16 +477,18 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         ActivityCompat.requestPermissions(
                             this,
-                            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                             18
                         )
                     }////ask fine location
                     else {
-                        //opentermsActivity()
+                        opentermsActivity()
+                        mainsetting()
                     }
                 }//////write external storage
                 18 -> {
                     opentermsActivity()
+                    mainsetting()
                 }//////access fine location
             }/////if granted
         }
