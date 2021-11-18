@@ -294,16 +294,18 @@ class ble_device : AppCompatActivity() {
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 1 || newState == 2) {
-                val result = gatt.requestMtu(256)
+                gatt.requestMtu(300)
+                sleep(2000)
+
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
+
                 }
                 else{
                     gatt.discoverServices()
                 }
-                //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
                 //String address = device.getAddress();
             }
