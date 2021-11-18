@@ -984,6 +984,30 @@ private val uiRunnable: Runnable = object : Runnable {
             catch(e :Exception){
                 e.message?.let { Log.d("on notify", it) }
             }
+            try{
+                var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
+                if(notify_success) Log.i("cVERMACnotify", "Enable notify 2")
+                else Log.e("cVERMACnotify", "Fail to enable notify 2")
+            }
+            catch(e :Exception){
+                e.message?.let { Log.d("on notify", it) }
+            }
+            try{
+                var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_INFO, true)
+                if(notify_success) Log.i("cINFOnotify", "Enable notify 3")
+                else Log.e("cINFOnotify", "Fail to enable notify 3")
+            }
+            catch(e :Exception){
+                e.message?.let { Log.d("on notify", it) }
+            }
+            try{
+                var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_COMMAND, true)
+                if(notify_success) Log.i("cCOMMANDnotify", "Enable notify 4")
+                else Log.e("cCOMMANDnotify", "Fail to enable notify 4")
+            }
+            catch(e :Exception){
+                e.message?.let { Log.d("on notify", it) }
+            }
 
 
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
