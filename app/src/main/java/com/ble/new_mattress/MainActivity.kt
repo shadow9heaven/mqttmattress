@@ -290,7 +290,6 @@ class MainActivity : AppCompatActivity() {
                     else if (CHARACTERISTIC_VER_MAC!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
                         dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
                         Log.e("VER_MAC-indicate", "dp:" + dp.toString())
-
                     }
                     var tmp = mgatt!!.writeDescriptor(dp)
                     Log.e("response",tmp.toString())

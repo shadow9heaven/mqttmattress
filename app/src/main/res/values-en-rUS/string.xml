@@ -8,7 +8,9 @@
 
     <string name="adjust_hard">adjust</string>
     <string name="relieve_stress">reli</string>
-    <string name="meditation">medi</string>
+    <string name="meditation">weist</string>
+    <string name="bodytune">body</string>
+    <string name="trainstart">train start</string>
 
     <string name="options">Options</string>
     <string name="credit">Credit</string>

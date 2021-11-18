@@ -8,7 +8,9 @@
 
     <string name="adjust_hard">调整</string>
     <string name="relieve_stress">舒压</string>
-    <string name="meditation">冥想</string>
+    <string name="meditation">护腰</string>
+    <string name="bodytune">体动</string>
+    <string name="trainstart">开始训练</string>
 
     <string name="options">Options</string>
     <string name="credit">Credit</string>

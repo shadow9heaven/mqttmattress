@@ -556,6 +556,32 @@
                     android:translationX="-5dp"
                     />
             </FrameLayout>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:onClick="clickbody1"
+                    app:srcCompat="@drawable/meditation_m_button_off"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/bodytune"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/purple_500"
+                    android:layout_gravity="right|center_vertical"
+                    android:translationX="-5dp"
+                    />
+            </FrameLayout>
         </LinearLayout>
 
 

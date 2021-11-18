@@ -8,7 +8,11 @@
 
     <string name="adjust_hard">調整</string>
     <string name="relieve_stress">舒壓</string>
-    <string name="meditation">冥想</string>
+    <string name="meditation">護腰</string>
+    <string name="bodytune">體動</string>
+
+    <string name="trainstart">開始訓練</string>
+
 
     <string name="options">選項</string>
     <string name="credit">關於app</string>

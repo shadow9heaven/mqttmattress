@@ -71,11 +71,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli1"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
 
                     <FrameLayout
@@ -85,32 +85,34 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
+
                         <SeekBar
                             android:id="@+id/wb_head"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:rotation="270"
-                            android:progress="10"
-                            android:saveEnabled="false"
-                            android:foregroundGravity="left"
                             android:layout_gravity="center"
-                            />
+                            android:alpha="0.5"
+                            android:foregroundGravity="left"
+                            android:progress="10"
+
+                            android:rotation="270"
+                            android:saveEnabled="false" />
 
                         <SeekBar
                             android:id="@+id/sb_head"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:thumb="@drawable/bar_thumb"
-                            android:progressDrawable="@drawable/draw_seekbar"
-                            android:rotation="270"
                             android:layout_gravity="center"
+                            android:alpha="0.5"
                             android:maxHeight="3dp"
                             android:minHeight="3dp"
-
                             android:progress="10"
-                            />
+                            android:progressDrawable="@drawable/draw_seekbar"
+
+                            android:rotation="270"
+                            android:thumb="@drawable/bar_thumb" />
                     </FrameLayout>
 
                     <TextView
@@ -134,11 +136,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli2"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
 
                     <FrameLayout
@@ -154,6 +156,7 @@
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:rotation="270"
+                            android:alpha="0.5"
                             android:progress="10"
                             android:saveEnabled="false"
                             android:layout_gravity="center"
@@ -166,6 +169,7 @@
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
                             android:rotation="270"
+                            android:alpha="0.5"
                             android:thumb="@drawable/bar_thumb"
                             android:progressDrawable="@drawable/draw_seekbar"
                             android:maxHeight="3dp"
@@ -193,11 +197,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli3"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
 
 
@@ -208,27 +212,33 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
+
                         <SeekBar
                             android:id="@+id/wb_shoulder"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:rotation="270"
+                            android:alpha="0.5"
                             android:progress="10"
+
+                            android:rotation="270"
                             android:saveEnabled="false" />
+
                         <SeekBar
                             android:id="@+id/sb_shoulder"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:rotation="270"
-                            android:thumb="@drawable/bar_thumb"
-                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:alpha="0.5"
+
                             android:maxHeight="3dp"
                             android:minHeight="3dp"
-                            android:progress="10" />
+                            android:progress="10"
+                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:rotation="270"
+                            android:thumb="@drawable/bar_thumb" />
                     </FrameLayout>
 
                     <TextView
@@ -252,11 +262,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli4"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
 
                     <FrameLayout
@@ -266,29 +276,34 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
+
                         <SeekBar
                             android:id="@+id/wb_back"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center"
                             android:layout_centerInParent="true"
-                            android:rotation="270"
+                            android:layout_gravity="center"
+                            android:alpha="0.5"
                             android:progress="10"
-                            android:saveEnabled="false"/>
+                            android:rotation="270"
+                            android:saveEnabled="false" />
+
                         <SeekBar
                             android:id="@+id/sb_back"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center"
                             android:layout_centerInParent="true"
-                            android:rotation="270"
-                            android:thumb="@drawable/bar_thumb"
-                            android:progressDrawable="@drawable/draw_seekbar"
+
+                            android:layout_gravity="center"
+                            android:alpha="0.5"
                             android:maxHeight="3dp"
                             android:minHeight="3dp"
-                            android:progress="10" />
+                            android:progress="10"
+                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:rotation="270"
+                            android:thumb="@drawable/bar_thumb" />
 
                     </FrameLayout>
 
@@ -312,11 +327,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli5"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
 
                     <FrameLayout
@@ -326,29 +341,35 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
+
                         <SeekBar
                             android:id="@+id/wb_weist"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center"
                             android:layout_centerInParent="true"
-                            android:rotation="270"
+
+                            android:layout_gravity="center"
+                            android:alpha="0.5"
                             android:progress="10"
+                            android:rotation="270"
                             android:saveEnabled="false" />
+
                         <SeekBar
                             android:id="@+id/sb_weist"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center"
                             android:layout_centerInParent="true"
-                            android:rotation="270"
-                            android:thumb="@drawable/bar_thumb"
-                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:layout_gravity="center"
+                            android:alpha="0.5"
+
                             android:maxHeight="3dp"
                             android:minHeight="3dp"
-                            android:progress="10" />
+                            android:progress="10"
+                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:rotation="270"
+                            android:thumb="@drawable/bar_thumb" />
 
                     </FrameLayout>
 
@@ -373,11 +394,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:gravity="center"
-                        android:onClick="clickreli"
+                        android:onClick="clickreli6"
 
                         app:srcCompat="@drawable/medi_start"
                         android:scaleType="fitXY"
-                        android:background="@color/material_on_background_disabled"
+                        android:background="@android:color/transparent"
                         />
                     <FrameLayout
                         android:layout_height="300dp"
@@ -386,27 +407,32 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
+
                         <SeekBar
                             android:id="@+id/wb_butt"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:rotation="270"
+                            android:alpha="0.5"
                             android:progress="10"
+                            android:rotation="270"
                             android:saveEnabled="false" />
+
                         <SeekBar
                             android:id="@+id/sb_butt"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:rotation="270"
-                            android:thumb="@drawable/bar_thumb"
-                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:alpha="0.5"
                             android:maxHeight="3dp"
+
                             android:minHeight="3dp"
-                            android:progress="10"/>
+                            android:progress="10"
+                            android:progressDrawable="@drawable/draw_seekbar"
+                            android:rotation="270"
+                            android:thumb="@drawable/bar_thumb" />
 
                     </FrameLayout>
 
@@ -414,9 +440,9 @@
                         android:id="@+id/textbutt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:gravity = "center"
-                        android:text="6" />
+                        android:gravity="center"
+                        android:text="6"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
             <ImageView
@@ -521,6 +547,32 @@
                         android:translationX="-5dp"
                         />
                 </FrameLayout>
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@android:color/transparent"
+                        android:onClick="clickbody1"
+                        app:srcCompat="@drawable/meditation_m_button_off"
+                        />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/bodytune"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/purple_500"
+                        android:layout_gravity="right|center_vertical"
+                        android:translationX="-5dp"
+                        />
+                </FrameLayout>
             </LinearLayout>
 
 
@@ -538,7 +590,52 @@
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.16"
-                app:srcCompat="@drawable/bed_all" />
+                app:srcCompat="@drawable/bed_right" />
+            <LinearLayout
+                android:id = "@+id/ll_relileveltune"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintStart_toEndOf="@id/ll_adjbar"
+                app:layout_constraintTop_toBottomOf="@id/bed_btn"
+                >
+                <ImageButton
+                    android:id="@+id/medi_minus"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="fitXY"
+                    android:onClick="clickreliminus"
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/medi_minus"
+                    />
+
+                    <TextView
+                        android:id="@+id/tv_medi_settime"
+                        android:layout_width="30dp"
+                        android:layout_height = "30dp"
+                        android:background="@drawable/medi_time"
+                        android:text = "1"
+                        android:textStyle="bold"
+                        android:textSize= "18dp"
+                        android:gravity = "center"
+                        />
+
+
+                <ImageButton
+                    android:id="@+id/medi_plus"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="fitXY"
+                    android:onClick="clickreliplus"
+
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/medi_plus" />
+
+
+
+            </LinearLayout>
 
             <ImageView
                 android:layout_width="50dp"

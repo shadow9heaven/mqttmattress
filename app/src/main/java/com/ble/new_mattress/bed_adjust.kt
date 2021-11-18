@@ -66,7 +66,7 @@ class bed_adjust : AppCompatActivity() {
 
     val topic2 = arrayOf("control","sensor","ack","err","config","model","ota","else")
 
-    var wifi_mac = "7c:df:a1:c2:13:c8"
+    var wifi_mac = ""
 
     //var wifi_mac = "7c:df:a1:c2:96:ac"
 
@@ -122,19 +122,27 @@ class bed_adjust : AppCompatActivity() {
 
 /////cohe timer
 
-////airbag connect
 
-////airbag connect
+//////reli on off
 
-//////cade on off
-    var cade_1 = 0.toShort()
-    var cade_2 = 0.toShort()
-    var cade_3 = 0.toShort()
-    var cade_4 = 0.toShort()
-    var cade_5 = 0.toShort()
-    var cade_6 = 0.toShort()
 
-//////cade on off
+    var reli_part = 1
+    var reli_level = 1
+    var FLAG_RELI_ONOFF = false
+
+    val RELI_MAX = 5
+    val RELI_MIN = 1
+
+    lateinit var tv_medi_settime :TextView
+    lateinit var ib_reli1 :ImageButton
+    lateinit var ib_reli2 :ImageButton
+    lateinit var ib_reli3 :ImageButton
+    lateinit var ib_reli4 :ImageButton
+    lateinit var ib_reli5 :ImageButton
+    lateinit var ib_reli6 :ImageButton
+
+
+//////reli on off
 
     ///////////seek bar for draw
     var sb_head: SeekBar? = null
@@ -521,11 +529,10 @@ private val uiRunnable: Runnable = object : Runnable {
                 if(current_shoulder>0) current_shoulder -= 1
                 num_shoulder.text = "$current_shoulder"
 
-
         }
     }//////shoulder draggable
 
-    val tune_back     = object : SeekBar.OnSeekBarChangeListener{
+    val tune_back  = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
         }
 
@@ -597,6 +604,7 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
     fun findviewID1(){
+
         //////////////////////findviewbyid
         setContentView(R.layout.activity_bed_adjust)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -655,14 +663,56 @@ private val uiRunnable: Runnable = object : Runnable {
     fun findviewID2(){
         setContentView(R.layout.activity_bed_cadence)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        tv_medi_settime = findViewById(R.id.tv_medi_settime)
         bed_btn = findViewById(R.id.bed_btn)
         bed_icn = findViewById(R.id.bed_icn)
+        /////disable watchbar first
+        sb_head = findViewById(R.id.wb_head);
+        sb_neck = findViewById(R.id.wb_neck);
+        sb_shoulder = findViewById(R.id.wb_shoulder);
+        sb_back = findViewById(R.id.wb_back);
+        sb_weist = findViewById(R.id.wb_weist);
+        sb_butt = findViewById(R.id.wb_butt);
+/////////
+        sb_head?.setEnabled(false)
+        sb_neck?.setEnabled(false)
+        sb_shoulder?.setEnabled(false)
+        sb_back?.setEnabled(false)
+        sb_weist?.setEnabled(false)
+        sb_butt?.setEnabled(false)
+//////////
+
+        sb_head = findViewById(R.id.sb_head);
+        sb_neck = findViewById(R.id.sb_neck);
+        sb_shoulder = findViewById(R.id.sb_shoulder);
+        sb_back = findViewById(R.id.sb_back);
+        sb_weist = findViewById(R.id.sb_weist);
+        sb_butt = findViewById(R.id.sb_butt);
+
+        ib_reli1 = findViewById(R.id.ib_reli1)
+        ib_reli2 = findViewById(R.id.ib_reli2)
+        ib_reli3 = findViewById(R.id.ib_reli3)
+        ib_reli4 = findViewById(R.id.ib_reli4)
+        ib_reli5 = findViewById(R.id.ib_reli5)
+        ib_reli6 = findViewById(R.id.ib_reli6)
 
     }/////for bed cadence
     fun findviewID3(){
         setContentView(R.layout.activity_bed_meditation)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+
     }/////for bed meditation
+    fun findviewID4(){
+        setContentView(R.layout.activity_body_move)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+
+
+
+    }
+
 
     fun byte2str(input:Int):String{
         var strtmp = ""
@@ -716,6 +766,7 @@ private val uiRunnable: Runnable = object : Runnable {
         else{
             findviewID1()
         }
+
     }
 
     override fun onDestroy() {
@@ -734,14 +785,7 @@ private val uiRunnable: Runnable = object : Runnable {
         uihandle.removeCallbacks(uiRunnable)
 
         FLAG_MQTT_CONNECT = false
-        /*
-        try{
-            cmdthread.interrupt()
-        }
-        catch(e : Exception){
 
-        }
-         */
 
     }
 
@@ -804,14 +848,14 @@ private val uiRunnable: Runnable = object : Runnable {
             when(characteristic.uuid){
                 UUID.fromString(VER_MAC_UUID)->{
                     var wifi_ByteArray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
-                    Log.d("onVerMac",wifi_ByteArray.toString())
+                    Log.d("onVERMAC",wifi_ByteArray.toString())
+
                 }/////get version and mac
                 UUID.fromString(INFO_UUID)->{
 
                 }/////get info
             }
         }
-
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 2) {
@@ -847,15 +891,31 @@ private val uiRunnable: Runnable = object : Runnable {
             Log.e("DW", gatt.toString())
             Log.e("DW", descriptor.toString())
             ////send connect both device
+
             when(descriptor){
                 CHARACTERISTIC_DATA!!.getDescriptors().first()->{
+                    val dp = CHARACTERISTIC_DATA!!.getDescriptors().last()
+                    Log.i("CHARACTERISTIC_DATA-2", "dp:" + dp.toString())
+                    if (dp != null) {
+                        if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
+                            dp.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        }
+                        else if (CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_INDICATE != 0 ) {
+                            dp.value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                        }
+                        var tmp = mgatt!!.writeDescriptor(dp)
+                        Log.e("response",tmp.toString())
+                    }
+                }
+
+                CHARACTERISTIC_DATA!!.getDescriptors().last()-> {
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     //mgatt!!.readCharacteristic(CHARACTERISTIC_INFO)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
-                }
+                }/////get mac and version first
                 CHARACTERISTIC_COMMAND!!.getDescriptors().last()->{
-                    for (dp in CHARACTERISTIC_DATA!!.getDescriptors()){
+                   val dp  = CHARACTERISTIC_DATA!!.getDescriptors().first()
                         Log.i("CHARACTERISTIC_INFO", "dp:" + dp.toString())
                         if (dp != null) {
                             if(CHARACTERISTIC_DATA!!.getProperties() != 0 && BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0){
@@ -866,10 +926,7 @@ private val uiRunnable: Runnable = object : Runnable {
                             }
                             var tmp = mgatt!!.writeDescriptor(dp)
                             Log.e("response",tmp.toString())
-                        }
-                    }
-                    /////get mac and version first
-
+                        }/////get mac and version first
 
                 }///////send get mac first
                 CHARACTERISTIC_VER_MAC!!.getDescriptors().last()->{
@@ -886,6 +943,8 @@ private val uiRunnable: Runnable = object : Runnable {
                             Log.e("response",tmp.toString())
                         }
                     }
+                    mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
+
                 }////////get info descriptor after ver mac
                 CHARACTERISTIC_INFO!!.getDescriptors().last()->{
                     for (dp in CHARACTERISTIC_COMMAND!!.getDescriptors()) {
@@ -904,7 +963,6 @@ private val uiRunnable: Runnable = object : Runnable {
                 }//////get commmand descriptor after info
             }
 
-
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
@@ -922,33 +980,6 @@ private val uiRunnable: Runnable = object : Runnable {
                 var notify_success = gatt!!.setCharacteristicNotification(CHARACTERISTIC_DATA, true)
                 if(notify_success) Log.i("cDATAnotify", "Enable notify 1")
                 else Log.e("cDATAnotify", "Fail to enable notify 1")
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-
-            try{
-                var notify_success2 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_VER_MAC, true)
-                if(notify_success2) Log.i("cDATAnotify", "Enable notify 2")
-                else Log.e("cVERMACnotify", "Fail to enable notify 2")
-
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success3 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_INFO, true)
-                if(notify_success3) Log.i("cDATAnotify", "Enable notify 3")
-                else Log.e("cINFOnotify", "Fail to enable notify 3")
-
-            }
-            catch(e :Exception){
-                e.message?.let { Log.d("on notify", it) }
-            }
-            try{
-                var notify_success4 = gatt!!.setCharacteristicNotification(CHARACTERISTIC_COMMAND, true)
-                if(notify_success4) Log.i("cDATAnotify", "Enable notify 4")
-                else Log.e("cCOMMANDnotify", "Fail to enable notify 4")
             }
             catch(e :Exception){
                 e.message?.let { Log.d("on notify", it) }
@@ -976,12 +1007,111 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
 /////////relieve mode
-    fun clickreli(view: View) {
+
+    fun turn_relion(){
+        FLAG_RELI_ONOFF = true
+        var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),reli_level.toByte())
+        mqttpublish(com, CMD_RELIEVE_STRESS)
+
+        sb_head!!.alpha = 0.5f
+        sb_neck!!.alpha = 0.5f
+        sb_shoulder!!.alpha = 0.5f
+        sb_weist!!.alpha = 0.5f
+        sb_back!!.alpha = 0.5f
+        sb_butt!!.alpha = 0.5f
+
+        when(reli_part){
+            1->{
+
+            }
+            2->{
+
+            }
+            3->{
+
+            }
+            4->{
+
+            }
+            5->{
+
+            }
+            6->{
+
+            }
+
+        }
 
     }
 
+    fun turn_relionoff(part : Int){
+        if(FLAG_RELI_ONOFF){
+            ///if RELI already on
+            var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),0x00.toByte())
+            mqttpublish(com, CMD_RELIEVE_STRESS)
+            /////turn on if not the same part pressed
+            if(part != reli_part){
+                reli_part = part
+                turn_relion()
+            }
+            else{
+                FLAG_RELI_ONOFF = false
+            }////just turn off if part is the same
 
+        }/////RELI already on
+    //////turn on
+        else{
+            turn_relion()
+        }/////else turn on
+    }
+    fun clickreli1(view: View) {
 
+        turn_relionoff(1)
+
+    }
+    fun clickreli2(view: View) {
+
+        turn_relionoff(2)
+
+    }
+    fun clickreli3(view: View) {
+
+        turn_relionoff(3)
+
+    }
+    fun clickreli4(view: View) {
+
+        turn_relionoff(4)
+
+    }
+    fun clickreli5(view: View) {
+
+        turn_relionoff(5)
+
+    }
+    fun clickreli6(view: View) {
+
+        turn_relionoff(6)
+
+    }
+
+    fun clickreliminus(view: View) {
+        if(reli_level>RELI_MIN){
+            reli_level--
+        }////
+        else{
+            ////already min
+        }
+    }
+
+    fun clickreliplus(view: View) {
+        if(reli_level>RELI_MAX){
+            reli_level++
+        }////
+        else{
+            ////already max
+        }
+    }
 /////////relieve mode
 
     fun clickmenu(view: View) {
@@ -1156,6 +1286,15 @@ private val uiRunnable: Runnable = object : Runnable {
         mode = "medi"
         findviewID3()
     }
+
+    fun clickbody1(view: View) {
+        mode = "body"
+        findviewID4()
+    }
+
+    fun clickfunmedi(view: View) {}
+
+
 ////////click fragment change
 
 
