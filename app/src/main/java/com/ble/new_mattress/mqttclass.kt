@@ -14,6 +14,7 @@ import MAVLink.bootloader.msg_bl_command
 import MAVLink.bootloader.msg_bl_ota
 import MAVLink.smartmattress.*
 import com.ble.new_mattress.FLAG_MATTRESS_ACK
+import com.ble.new_mattress.FLAG_MQTT_CONNECT
 import com.ble.new_mattress.FLAG_WIFI_CONNECT
 import com.ble.new_mattress.bed_pressure
 
@@ -180,6 +181,8 @@ class MqttClass {
 
             override fun connectionLost(cause: Throwable?) {
                 Log.d(TAG, "Connection lost ${cause.toString()}")
+                FLAG_MQTT_CONNECT = false
+
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken?) {

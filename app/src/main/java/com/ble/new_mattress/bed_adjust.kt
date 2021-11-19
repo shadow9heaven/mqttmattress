@@ -13,9 +13,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import androidx.drawerlayout.widget.DrawerLayout
 import com.ble.mqttexample.MqttClass
-import com.google.android.material.navigation.NavigationView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,7 +24,9 @@ import MAVLink.bootloader.*
 import MAVLink.smartmattress.*
 import MAVLink.logger.*
 import MAVLink.bluetooth.*
-import MAVLink.common.msg_radio_status
+import android.annotation.SuppressLint
+
+import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.view.WindowManager
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -73,11 +73,12 @@ class bed_adjust : AppCompatActivity() {
 //////for mqtt protocol
 
 /////FLAG
-    var FLAG_MQTT_CONNECT = false
-    var FLAG_CLICK_BED = false
-    var FLAG_AUTO_TUNE = false
-/////FLAG
 
+    var FLAG_CLICK_BED = false /////click the bed button
+    var FLAG_MEDI_ON = false  ///// true when mode 3 on
+    var FLAG_AUTO_TUNE = false //////for body tune function ?
+    var FLAG_RELI_ONOFF = false ///////true when mode 2 on
+/////FLAG
 
     lateinit var extFile: File
     var soundexist: Boolean = false
@@ -108,6 +109,8 @@ class bed_adjust : AppCompatActivity() {
 
     lateinit var bed_btn :ImageView
     lateinit var bed_icn :ImageView
+    lateinit var iv_bleicn :ImageView
+
 /////////left or right
 
 
@@ -125,10 +128,9 @@ class bed_adjust : AppCompatActivity() {
 
 //////reli on off
 
-
     var reli_part = 1
     var reli_level = 1
-    var FLAG_RELI_ONOFF = false
+
 
     val RELI_MAX = 5
     val RELI_MIN = 1
@@ -140,11 +142,18 @@ class bed_adjust : AppCompatActivity() {
     lateinit var ib_reli4 :ImageButton
     lateinit var ib_reli5 :ImageButton
     lateinit var ib_reli6 :ImageButton
-
-
 //////reli on off
 
+//////medi on off
+    lateinit var ib_funmedi : ImageButton
+    lateinit var iv_medistatus : ImageView
+//////medi on off
+
     ///////////seek bar for draw
+    lateinit var GREENBAR : Drawable
+    lateinit var PURPLEBAR : Drawable
+
+
     var sb_head: SeekBar? = null
     var sb_neck: SeekBar? = null
     var sb_shoulder: SeekBar? = null
@@ -271,6 +280,8 @@ private val uiRunnable: Runnable = object : Runnable {
                 catch(e:Exception){
 
                 }
+                if(FLAG_MQTT_CONNECT)iv_bleicn.setImageResource(R.drawable.bt_on)
+                else iv_bleicn.setImageResource(R.drawable.bt_off)
             }
             else {
 
@@ -280,7 +291,6 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 }////uihandle?.postDelayed(uiRunnable, 0)///////run
     //// uihandle.removeCallbacks(uiRunnable)///stop
-
 
 ///////////handler function
 
@@ -303,7 +313,6 @@ private val uiRunnable: Runnable = object : Runnable {
         mqttclass!!.disconnect()
         //unregisterReceiver()
     }
-
 
     fun mqttpublish(com :ByteArray, msgid:Int) {
 
@@ -355,8 +364,15 @@ private val uiRunnable: Runnable = object : Runnable {
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                 val pos = com[1].toShort()
                 val level = com[2].toShort()
-                val mavpac = msg_meditation(0x55,bed_lrb.toShort(),pos,level)
-                publishmsg!!.setPayload(mavpac.pack().encodePacket())
+
+                //////////TODO
+                try{
+                    val mavpac = msg_meditation(0x55,bed_lrb.toShort(),pos,level)
+                    publishmsg!!.setPayload(mavpac.pack().encodePacket())
+                }
+                catch(e: Exception){
+                    Log.e("medi",e.message!!)
+                }/////Value is outside of the range of an unsigned byte: -1
 
             }/////54
 
@@ -407,10 +423,7 @@ private val uiRunnable: Runnable = object : Runnable {
     }
     /////mqtt function
 
-    fun change_time(sec:Int) : String{
-        if(sec % 60 >9)return (sec/60).toString() +":"+ (sec % 60).toString()
-        else return (sec/60).toString()+":0"+ (sec%60).toString()
-    }
+
 
     fun send_commandbyBle(com :ByteArray, msgid:Int) :Boolean{
             //val mavparser = Parser().mavlink_parse_char(34)
@@ -464,13 +477,13 @@ private val uiRunnable: Runnable = object : Runnable {
     }/////seekbar undraggable
 
 
-    val tune_head     = object : SeekBar.OnSeekBarChangeListener{
+    val tune_head  = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
 
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tunehead"+ current_head.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_1,current_head.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
@@ -480,7 +493,7 @@ private val uiRunnable: Runnable = object : Runnable {
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             current_head = (progress / progressdivide)
-            if(current_head>0) current_head -= 1
+            if(current_head>19) current_head -= 1
             num_head.text = "$current_head"
         }
     }////////head draggable
@@ -491,18 +504,17 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tuneneck"+ current_neck.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_2,current_neck.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
             }
-
         }
 
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             //if(mode == "cohe") {
             current_neck = progress /progressdivide
-            if(current_neck>0) current_neck -= 1
+            if(current_neck>19) current_neck -= 1
 
             num_neck.text = "$current_neck"
 
@@ -515,7 +527,7 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tuneshoulder"+ current_shoulder.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_3,current_shoulder.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
@@ -526,7 +538,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_shoulder = progress / progressdivide
-                if(current_shoulder>0) current_shoulder -= 1
+                if(current_shoulder>19) current_shoulder -= 1
                 num_shoulder.text = "$current_shoulder"
 
         }
@@ -537,7 +549,7 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tuneback"+ current_back.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_4,current_back.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
@@ -548,9 +560,8 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_back = progress / progressdivide
-                if(current_back>0) current_back -= 1
+                if(current_back>19) current_back -= 1
                 num_back.text = "$current_back"
-
 
         }
     }//////back draggable
@@ -560,7 +571,7 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?){
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tuneweist"+ current_weist.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_5,current_weist.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
@@ -570,7 +581,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 current_weist = progress / progressdivide
-                if(current_weist>0) current_weist -= 1
+                if(current_weist>19) current_weist -= 1
                 num_weist.text = "$current_weist"
 
         }
@@ -581,7 +592,7 @@ private val uiRunnable: Runnable = object : Runnable {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            if(FLAG_WIFI_CONNECT && mode == "cohe"){
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT && mode == "cohe"){
                 Log.d(TAG,"tunebutt"+ current_butt.toString())
                 var com = byteArrayOf(bed_lrb.toByte(),pos_6,current_butt.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
@@ -592,7 +603,7 @@ private val uiRunnable: Runnable = object : Runnable {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
 
                 current_butt = progress / progressdivide
-                if(current_butt>0) current_butt -= 1
+                if(current_butt>19) current_butt -= 1
                 num_butt.text = "$current_butt"
 
         }
@@ -608,13 +619,17 @@ private val uiRunnable: Runnable = object : Runnable {
         //////////////////////findviewbyid
         setContentView(R.layout.activity_bed_adjust)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        bed_btn = findViewById(R.id.bed_btn)
+        bed_icn = findViewById(R.id.bed_icn)
+        iv_bleicn = findViewById(R.id.iv_bleicn)
+
         num_head = findViewById(R.id.num_head)
         num_neck = findViewById(R.id.num_neck)
         num_shoulder = findViewById(R.id.num_shoulder)
         num_back = findViewById(R.id.num_back)
         num_weist = findViewById(R.id.num_weist)
         num_butt =findViewById(R.id.num_butt)
-
 
         /////disable watchbar first
         sb_head = findViewById(R.id.wb_head);
@@ -656,10 +671,10 @@ private val uiRunnable: Runnable = object : Runnable {
         sb_weist?.setOnSeekBarChangeListener(tune_weist)
         sb_butt?.setOnSeekBarChangeListener(tune_butt)
 
-        bed_btn = findViewById(R.id.bed_btn)
-        bed_icn = findViewById(R.id.bed_icn)
 
+        setbedlrb()
     }/////for bed adjust
+    @SuppressLint("ClickableViewAccessibility")
     fun findviewID2(){
         setContentView(R.layout.activity_bed_cadence)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -667,21 +682,9 @@ private val uiRunnable: Runnable = object : Runnable {
         tv_medi_settime = findViewById(R.id.tv_medi_settime)
         bed_btn = findViewById(R.id.bed_btn)
         bed_icn = findViewById(R.id.bed_icn)
+        iv_bleicn = findViewById(R.id.iv_bleicn)
+
         /////disable watchbar first
-        sb_head = findViewById(R.id.wb_head);
-        sb_neck = findViewById(R.id.wb_neck);
-        sb_shoulder = findViewById(R.id.wb_shoulder);
-        sb_back = findViewById(R.id.wb_back);
-        sb_weist = findViewById(R.id.wb_weist);
-        sb_butt = findViewById(R.id.wb_butt);
-/////////
-        sb_head?.setEnabled(false)
-        sb_neck?.setEnabled(false)
-        sb_shoulder?.setEnabled(false)
-        sb_back?.setEnabled(false)
-        sb_weist?.setEnabled(false)
-        sb_butt?.setEnabled(false)
-//////////
 
         sb_head = findViewById(R.id.sb_head);
         sb_neck = findViewById(R.id.sb_neck);
@@ -690,26 +693,68 @@ private val uiRunnable: Runnable = object : Runnable {
         sb_weist = findViewById(R.id.sb_weist);
         sb_butt = findViewById(R.id.sb_butt);
 
+        sb_head?.setOnTouchListener(l)
+        sb_neck?.setOnTouchListener(l)
+        sb_shoulder?.setOnTouchListener(l)
+        sb_back?.setOnTouchListener(l)
+        sb_weist?.setOnTouchListener(l)
+        sb_butt?.setOnTouchListener(l)
+
         ib_reli1 = findViewById(R.id.ib_reli1)
         ib_reli2 = findViewById(R.id.ib_reli2)
         ib_reli3 = findViewById(R.id.ib_reli3)
         ib_reli4 = findViewById(R.id.ib_reli4)
         ib_reli5 = findViewById(R.id.ib_reli5)
         ib_reli6 = findViewById(R.id.ib_reli6)
+        setbedlrb()
 
     }/////for bed cadence
+    fun setbedlrb(){
+        when(bed_lrb){
+            0->{
+                sb_head?.setProgress(current_head*progressdivide)
+                sb_neck?.setProgress(current_neck*progressdivide)
+                sb_shoulder?.setProgress(current_shoulder*progressdivide)
+                sb_back?.setProgress(current_back*progressdivide)
+                sb_weist?.setProgress(current_weist*progressdivide)
+                sb_butt?.setProgress(current_butt*progressdivide)
+                bed_btn.setImageResource(R.drawable.bed_all)
+                bed_icn.setImageResource(R.drawable.small_lr)
+            }
+            1->{
+
+                sb_head?.setProgress(current_head*progressdivide)
+                sb_neck?.setProgress(current_neck*progressdivide)
+                sb_shoulder?.setProgress(current_shoulder*progressdivide)
+                sb_back?.setProgress(current_back*progressdivide)
+                sb_weist?.setProgress(current_weist*progressdivide)
+                sb_butt?.setProgress(current_butt*progressdivide)
+
+                bed_btn.setImageResource(R.drawable.bed_left)
+                bed_icn.setImageResource(R.drawable.small_l)
+            }
+            2->{
+                sb_head?.setProgress(current_head*progressdivide)
+                sb_neck?.setProgress(current_neck*progressdivide)
+                sb_shoulder?.setProgress(current_shoulder*progressdivide)
+                sb_back?.setProgress(current_back*progressdivide)
+                sb_weist?.setProgress(current_weist*progressdivide)
+                sb_butt?.setProgress(current_butt*progressdivide)
+                bed_btn.setImageResource(R.drawable.bed_right)
+                bed_icn.setImageResource(R.drawable.small_r)
+            }
+        }
+    }
     fun findviewID3(){
         setContentView(R.layout.activity_bed_meditation)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
+        iv_medistatus = findViewById(R.id.iv_medistatus)
+        ib_funmedi = findViewById(R.id.ib_funmedi)
 
     }/////for bed meditation
     fun findviewID4(){
         setContentView(R.layout.activity_body_move)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-
-
 
     }
 
@@ -751,7 +796,8 @@ private val uiRunnable: Runnable = object : Runnable {
         findloadview()
         extFile = File(storagePath, "command.txt")
         uihandle?.postDelayed(uiRunnable, 0)
-
+        GREENBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar_reli)
+        PURPLEBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar)
         if(ble_cnt){
             mgatt!!.disconnect()
             mgatt!!.close()
@@ -989,7 +1035,6 @@ private val uiRunnable: Runnable = object : Runnable {
             }
 
 
-
             for (dp in CHARACTERISTIC_VER_MAC!!.getDescriptors()){
                 Log.e("CHARACTERISTIC_VER_MAC", "dp:" + dp.toString())
                 if (dp != null) {
@@ -1013,9 +1058,11 @@ private val uiRunnable: Runnable = object : Runnable {
 /////////relieve mode
 
     fun turn_relion(){
+
+
         FLAG_RELI_ONOFF = true
         var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),reli_level.toByte())
-        mqttpublish(com, CMD_RELIEVE_STRESS)
+        if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT)mqttpublish(com, CMD_RELIEVE_STRESS)
 
         sb_head!!.alpha = 0.5f
         sb_neck!!.alpha = 0.5f
@@ -1024,47 +1071,92 @@ private val uiRunnable: Runnable = object : Runnable {
         sb_back!!.alpha = 0.5f
         sb_butt!!.alpha = 0.5f
 
+
+
         when(reli_part){
             1->{
-
+                sb_head!!.alpha = 1f
+                //sb_head!!.scrollBarStyle
+                //sb_head!!.setProgressDrawableTiled(GREENBAR)
             }
             2->{
-
+                sb_neck!!.alpha = 1f
+                //sb_neck!!.setProgressDrawableTiled(GREENBAR)
             }
             3->{
-
+                sb_shoulder!!.alpha = 1f
+                //sb_shoulder!!.setProgressDrawableTiled(GREENBAR)
             }
             4->{
-
+                sb_back!!.alpha = 1f
+                //sb_back!!.setProgressDrawableTiled(GREENBAR)
             }
             5->{
-
+                sb_weist!!.alpha = 1f
+                //sb_weist!!.setProgressDrawableTiled(GREENBAR)
             }
             6->{
-
+                sb_butt!!.alpha = 1f
+                //sb_butt!!.setProgressDrawableTiled(GREENBAR)
             }
 
         }
 
+
     }
 
     fun turn_relionoff(part : Int){
+        /*
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            sb_head!!.setMaxHeight(3)
+            sb_head!!.setMinHeight(3)
+            sb_neck!!.setMaxHeight(3)
+            sb_neck!!.setMinHeight(3)
+            sb_shoulder!!.setMaxHeight(3)
+            sb_shoulder!!.setMinHeight(3)
+            sb_back!!.setMaxHeight(3)
+            sb_back!!.setMinHeight(3)
+            sb_weist!!.setMaxHeight(3)
+            sb_weist!!.setMinHeight(3)
+            sb_butt!!.setMaxHeight(3)
+            sb_butt!!.setMinHeight(3)
+        }
+
+        sb_head!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_neck!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_shoulder!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_weist!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_back!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_butt!!.setProgressDrawableTiled(PURPLEBAR)
+        */
         if(FLAG_RELI_ONOFF){
-            ///if RELI already on
+            ///if RELI already on, turn if off
             var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),0x00.toByte())
-            mqttpublish(com, CMD_RELIEVE_STRESS)
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT)mqttpublish(com, CMD_RELIEVE_STRESS)
+
             /////turn on if not the same part pressed
             if(part != reli_part){
+                /////set new reli part and turn on
                 reli_part = part
                 turn_relion()
             }
             else{
+                ///////turn off
                 FLAG_RELI_ONOFF = false
+                sb_head!!.alpha = 0.5f
+                sb_neck!!.alpha = 0.5f
+                sb_shoulder!!.alpha = 0.5f
+                sb_weist!!.alpha = 0.5f
+                sb_back!!.alpha = 0.5f
+                sb_butt!!.alpha = 0.5f
+
             }////just turn off if part is the same
 
         }/////RELI already on
     //////turn on
         else{
+            /////set reli part and turn on
+            reli_part = part
             turn_relion()
         }/////else turn on
     }
@@ -1098,19 +1190,27 @@ private val uiRunnable: Runnable = object : Runnable {
         turn_relionoff(6)
 
     }
-
+    /*
+    * triggered when relieve minus button is pressed
+    */
     fun clickreliminus(view: View) {
         if(reli_level>RELI_MIN){
+
             reli_level--
+            tv_medi_settime.text = reli_level.toString()
         }////
         else{
             ////already min
         }
     }
+    /*
+    * triggered when relieve plus button is pressed
+    */
 
     fun clickreliplus(view: View) {
-        if(reli_level>RELI_MAX){
+        if(reli_level<RELI_MAX){
             reli_level++
+            tv_medi_settime.text = reli_level.toString()
         }////
         else{
             ////already max
@@ -1118,6 +1218,9 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 /////////relieve mode
 
+    /*
+    * triggered when menu button is pressed
+    */
     fun clickmenu(view: View) {
         ////menu
         val popupMenu = PopupMenu(this, view)
@@ -1161,6 +1264,10 @@ private val uiRunnable: Runnable = object : Runnable {
 
     }
 
+
+    /*
+    *  triggered when bed button is pressed
+    */
     fun clickbed(view: View) {
 
         FLAG_CLICK_BED = true
@@ -1181,20 +1288,12 @@ private val uiRunnable: Runnable = object : Runnable {
             current_weist = set_lweist
             current_butt = set_lbutt
 
-            sb_head?.setProgress(current_head*progressdivide)
-            sb_neck?.setProgress(current_neck*progressdivide)
-            sb_shoulder?.setProgress(current_shoulder*progressdivide)
-            sb_back?.setProgress(current_back*progressdivide)
-            sb_weist?.setProgress(current_weist*progressdivide)
-            sb_butt?.setProgress(current_butt*progressdivide)
 
-            bed_btn.setImageResource(R.drawable.bed_left)
-            bed_icn.setImageResource(R.drawable.small_l)
 
             bed_lrb = 1
 
             ///UI set
-            set_bedUI()
+            setbedlrb()
             ///UI set
 
         }//////change to left
@@ -1214,20 +1313,9 @@ private val uiRunnable: Runnable = object : Runnable {
             current_weist = set_rweist
             current_butt = set_rbutt
 
-            sb_head?.setProgress(current_head*progressdivide)
-            sb_neck?.setProgress(current_neck*progressdivide)
-            sb_shoulder?.setProgress(current_shoulder*progressdivide)
-            sb_back?.setProgress(current_back*progressdivide)
-            sb_weist?.setProgress(current_weist*progressdivide)
-            sb_butt?.setProgress(current_butt*progressdivide)
-
-            bed_btn.setImageResource(R.drawable.bed_right)
-            bed_icn.setImageResource(R.drawable.small_r)
             bed_lrb = 2
 
-            ///UI set
-            set_bedUI()
-            ///UI set
+            setbedlrb()
 
         }//////change to right
         else if(bed_lrb == 2){
@@ -1246,30 +1334,14 @@ private val uiRunnable: Runnable = object : Runnable {
             current_weist = set_weist
             current_butt = set_butt
 
-            sb_head?.setProgress(current_head*progressdivide)
-            sb_neck?.setProgress(current_neck*progressdivide)
-            sb_shoulder?.setProgress(current_shoulder*progressdivide)
-            sb_back?.setProgress(current_back*progressdivide)
-            sb_weist?.setProgress(current_weist*progressdivide)
-            sb_butt?.setProgress(current_butt*progressdivide)
-
-
-            bed_btn.setImageResource(R.drawable.bed_all)
-            bed_icn.setImageResource(R.drawable.small_lr)
             bed_lrb = 0
 
-            ///cadence UI set
-            //set_UI(bed_lrb)
-            ///cadence UI set
+            setbedlrb()
         }///////change to both
 
         FLAG_CLICK_BED = false
 
     }////////click bed
-
-    private fun set_bedUI() {
-
-    }
 
     private fun broadcastUpdate(action: String) {
         val intent = Intent(action)
@@ -1296,7 +1368,29 @@ private val uiRunnable: Runnable = object : Runnable {
         findviewID4()
     }
 
-    fun clickfunmedi(view: View) {}
+    fun clickfunmedi(view: View) {
+        if(FLAG_MEDI_ON){
+         ////turn off
+            ib_funmedi.setImageResource(R.drawable.medi_start)
+            iv_medistatus.alpha = 0.5f
+            FLAG_MEDI_ON = false
+
+        }// turn off
+        else{
+         ////turn on
+            ib_funmedi.setImageResource(R.drawable.medi_stop)
+            iv_medistatus.alpha = 1f
+            FLAG_MEDI_ON = true
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT){
+                val com = byteArrayOf(bed_lrb.toByte(),0x04.toByte(),0xFF.toByte())
+                mqttpublish(com,CMD_MEDITATION)
+            }
+        }//turn on
+    }
+
+    fun clicktraining(view: View) {
+
+    }
 
 
 ////////click fragment change

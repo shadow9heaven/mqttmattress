@@ -145,11 +145,12 @@
 
             />
         <ImageView
+            android:id = "@+id/iv_medistatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="fitXY"
-            android:scaleX="0.5"
-            android:scaleY="0.5"
+            android:scaleX="0.75"
+            android:scaleY="0.75"
             android:alpha="0.5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -163,6 +164,7 @@
             />
 
         <ImageButton
+            android:id = "@+id/ib_funmedi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clickfunmedi"

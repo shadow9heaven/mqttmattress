@@ -1,6 +1,7 @@
 package com.ble.new_mattress
 
 import android.Manifest
+import android.app.AlertDialog
 import android.bluetooth.*
 import android.bluetooth.BluetoothAdapter.STATE_DISCONNECTED
 import android.bluetooth.le.ScanCallback
@@ -68,6 +69,10 @@ val COMMAND_UUID =       "670bef04-5278-1000-8034-12805f9b34fb"
 
 val mqttserverfile = "mqttserver.txt"
 val defaultmqttfile ="defaultmqttserver.txt"
+
+val ssidfile = "ssid.txt"
+val defaultssidfile = "defaultssid.txt"
+
 val mqttlist = arrayListOf<String>()
 
 var serverURL = "tcp://114.34.221.116:6673"
@@ -81,7 +86,7 @@ var mqttjson : JSONObject = JSONObject()
 var mgatt: BluetoothGatt? = null
 
 ///////global flag
-
+var FLAG_MQTT_CONNECT = false//////mqtt connect or not
 var FLAG_WIFI_CONNECT = false
 var FLAG_MATTRESS_ACK = false
 
@@ -108,6 +113,8 @@ class MainActivity : AppCompatActivity() {
 
     var FLAG_FOUNDDEVICE = false
     var bthHandler2: Handler? = Handler()
+
+    var uihandler: Handler? = Handler()
 
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -204,7 +211,11 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 CHARACTERISTIC_DATA!!.getDescriptors().last()-> {
-
+                    runOnUiThread {  ib_ble.setImageResource(R.drawable.bt_on)
+                        val builder = AlertDialog.Builder(this@MainActivity)
+                        builder.setMessage("Connect to " + bleaddress + " successful!")
+                        builder.show()
+                    }
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
@@ -320,12 +331,15 @@ class MainActivity : AppCompatActivity() {
                     ble_cnt = true
                     bleaddress = SavedBleAddr
                     bluetoothDevice = result!!.device
-                    ib_ble.setImageResource(R.drawable.bt_on)
+
+                    /*
                     Toast.makeText(
                         this@MainActivity,
                         "Connect to " + bleaddress + "!!",
                         Toast.LENGTH_SHORT
                     )
+                    */
+
                     FLAG_FOUNDDEVICE = false
 
                 }
@@ -446,6 +460,9 @@ class MainActivity : AppCompatActivity() {
         when(requestCode){
             1 -> {
                 if (resultCode == RESULT_OK) {
+                    val builder = AlertDialog.Builder(this@MainActivity)
+                    builder.setMessage("Connect to " + bleaddress + " successful!")
+                    builder.show()
                     ib_ble.setImageResource(R.drawable.bt_on)
                 }
             }/////ble device

@@ -51,7 +51,6 @@ public class msg_meditation extends MAVLinkMessage {
         packet.sysid = 255;
         packet.compid = 190;
         packet.msgid = MAVLINK_MSG_ID_MEDITATION;
-        
         packet.payload.putUnsignedByte(pk_type);
         packet.payload.putUnsignedByte(sub_bed);
         packet.payload.putUnsignedByte(pos);

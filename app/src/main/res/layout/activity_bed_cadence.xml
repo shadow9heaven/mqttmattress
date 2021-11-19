@@ -86,18 +86,7 @@
                         android:gravity="center"
                         >
 
-                        <SeekBar
-                            android:id="@+id/wb_head"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:alpha="0.5"
-                            android:foregroundGravity="left"
-                            android:progress="10"
 
-                            android:rotation="270"
-                            android:saveEnabled="false" />
 
                         <SeekBar
                             android:id="@+id/sb_head"
@@ -150,17 +139,6 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         >
-                        <SeekBar
-                            android:id="@+id/wb_neck"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:rotation="270"
-                            android:alpha="0.5"
-                            android:progress="10"
-                            android:saveEnabled="false"
-                            android:layout_gravity="center"
-                            />
 
                         <SeekBar
                             android:id="@+id/sb_neck"
@@ -213,17 +191,6 @@
                         android:gravity="center"
                         >
 
-                        <SeekBar
-                            android:id="@+id/wb_shoulder"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:alpha="0.5"
-                            android:progress="10"
-
-                            android:rotation="270"
-                            android:saveEnabled="false" />
 
                         <SeekBar
                             android:id="@+id/sb_shoulder"
@@ -277,17 +244,6 @@
                         android:gravity="center"
                         >
 
-                        <SeekBar
-                            android:id="@+id/wb_back"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:alpha="0.5"
-                            android:progress="10"
-                            android:rotation="270"
-                            android:saveEnabled="false" />
 
                         <SeekBar
                             android:id="@+id/sb_back"
@@ -342,18 +298,6 @@
                         android:gravity="center"
                         >
 
-                        <SeekBar
-                            android:id="@+id/wb_weist"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-
-                            android:layout_gravity="center"
-                            android:alpha="0.5"
-                            android:progress="10"
-                            android:rotation="270"
-                            android:saveEnabled="false" />
 
                         <SeekBar
                             android:id="@+id/sb_weist"
@@ -409,26 +353,16 @@
                         >
 
                         <SeekBar
-                            android:id="@+id/wb_butt"
-                            style="@android:style/Widget.Material.Light.SeekBar"
-                            android:layout_width="300dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:alpha="0.5"
-                            android:progress="10"
-                            android:rotation="270"
-                            android:saveEnabled="false" />
-
-                        <SeekBar
                             android:id="@+id/sb_butt"
                             style="@android:style/Widget.Material.Light.SeekBar"
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
                             android:alpha="0.5"
-                            android:maxHeight="3dp"
 
+                            android:maxHeight="3dp"
                             android:minHeight="3dp"
+
                             android:progress="10"
                             android:progressDrawable="@drawable/draw_seekbar"
                             android:rotation="270"
@@ -459,6 +393,18 @@
                 app:layout_constraintVertical_bias="0.95"
                 app:srcCompat="@drawable/small_r" />
 
+            <ImageView
+                android:id = "@+id/iv_bleicn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="fitXY"
+                android:layout_marginLeft="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+
+                app:layout_constraintStart_toEndOf="@id/bed_icn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.99"
+                app:srcCompat="@drawable/bt_off" />
             <LinearLayout
                 android:id = "@+id/ll_modechange"
                 android:layout_width="wrap_content"

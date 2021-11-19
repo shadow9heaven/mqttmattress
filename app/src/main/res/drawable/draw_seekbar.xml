@@ -11,7 +11,7 @@
         <clip>
             <shape>
                 <solid
-                    android:layout_height="6dp"
+                    android:layout_height="2dp"
                     android:color="@android:color/darker_gray" />
             </shape>
         </clip>
@@ -19,9 +19,9 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid
-                    android:layout_height ="6dp"
-                    android:color="@color/purple_700" />
+                <gradient
+                    android:layout_height ="2dp"
+                    android:startColor="@color/purple_200" android:endColor="@color/purple_700" />
             </shape>
         </clip>
     </item>

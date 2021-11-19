@@ -10,7 +10,7 @@
         <clip>
             <shape>
                 <solid
-                    android:layout_height ="6dp"
+                    android:layout_height ="2dp"
                     android:color="@android:color/darker_gray" />
             </shape>
         </clip>
@@ -19,8 +19,8 @@
         <clip>
             <shape>
                 <gradient
-                    android:layout_height ="6dp"
-                    android:startColor="#ffbcff79" android:endColor="#ff56cc00" />
+                    android:layout_height ="2dp"
+                    android:startColor="@color/yellowgreen_200" android:endColor="@color/yellowgreen_700" />
             </shape>
         </clip>
     </item>

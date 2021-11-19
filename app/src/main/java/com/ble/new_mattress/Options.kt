@@ -18,7 +18,10 @@ import android.widget.Toast
 
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +34,7 @@ class Options : AppCompatActivity() {
 
     lateinit var et_ssid :EditText
     lateinit var et_wifipwd : EditText
-
+    var ssidjson = JSONObject()
     val CMD_SET_SSID   = msg_wifi_set_ssid_password.MAVLINK_MSG_ID_WIFI_SET_SSID_PASSWORD              ///32
     val CMD_SET_IP_PWD = msg_mqtt_set_ip_password.MAVLINK_MSG_ID_MQTT_SET_IP_PASSWORD              ///33
     val CMD_SET_WIFI_CONNECT = msg_connect.MAVLINK_MSG_ID_CONNECT    ///34
@@ -51,6 +54,9 @@ class Options : AppCompatActivity() {
 
         when(msgid){
             CMD_SET_SSID->{
+                var ssidfiletmp = File(storagePath,ssidfile)
+                ssidfiletmp.delete()
+                ssidfiletmp.createNewFile()
                 val ssidstring = et_ssid.text.toString().toByteArray(Charsets.US_ASCII)
                 val pwdstring = et_wifipwd.text.toString().toByteArray(Charsets.US_ASCII)
 
@@ -70,6 +76,10 @@ class Options : AppCompatActivity() {
                     mavpac = cmdconstructor.pack().encodePacket()
                 }
                 else return false
+                ssidjson.put("ssid", ssid)
+                ssidjson.put("password",password)
+
+                ssidfiletmp.appendText(ssidjson.toString() + "\n")
 
             }/////32 set wifi ssid
             CMD_SET_IP_PWD->{
@@ -140,12 +150,38 @@ class Options : AppCompatActivity() {
         tv_serverip = findViewById(R.id.tv_serverip)
         tv_mqttuser = findViewById(R.id.tv_mqttuser)
         tv_mqttpwd = findViewById(R.id.tv_mqttpwd)
-
         et_ssid = findViewById(R.id.et_ssid)
         et_wifipwd = findViewById(R.id.et_wifipwd)
 
-        et_ssid.setText(wifi_ssid)
-        et_wifipwd.setText(wifi_pwd)
+        var ssidfiletmp = File(storagePath, ssidfile)
+        try {
+            val ssidtmp = ssidfiletmp.readText()
+            ssidjson = JSONObject(ssidtmp)
+        }
+        catch(e : Exception){
+            Log.d("main",e.message!!)
+
+            //mqttfile?.createNewFile()
+            ////write default mqtt server file
+            val reader = BufferedReader(InputStreamReader(getAssets().open(defaultssidfile), "UTF-8"))
+            var mLine = reader.readLine()
+            var wifilist = arrayListOf<String>()
+            while (mLine != null) {
+                if(mLine != "null" ) wifilist.add(mLine)
+                //process line
+                try{ mLine = reader.readLine()}
+                catch(e: IOException){
+                }
+            }
+
+            ssidjson.put("ssid", wifilist[0])
+            ssidjson.put("password", wifilist[1])
+            ssidfiletmp.appendText(ssidjson.toString() + "\n")
+
+        }
+
+        et_ssid.setText(ssidjson.getString("ssid"))
+        et_wifipwd.setText(ssidjson.getString("password"))
 
         tv_connected_device.text = SavedBleAddr
         tv_serverip.text = mqttjson.getString("server")

@@ -84,6 +84,11 @@
                         android:layout_height="match_parent"
                         android:rotation="270"
                         android:progress="10"
+                        android:translationX="-5dp"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:thumb="@android:color/transparent"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
                         android:saveEnabled="false"
                         android:foregroundGravity="left"
                         android:layout_gravity="center"
@@ -143,10 +148,15 @@
                         android:layout_height="match_parent"
                         android:rotation="270"
                         android:progress="10"
+                        android:translationX="-5dp"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:thumb="@android:color/transparent"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
                         android:saveEnabled="false"
+                        android:foregroundGravity="left"
                         android:layout_gravity="center"
                         />
-
                     <SeekBar
                         android:id="@+id/sb_neck"
                         style="@android:style/Widget.Material.Light.SeekBar"
@@ -159,6 +169,7 @@
                         android:maxHeight="3dp"
                         android:minHeight="3dp"
                         android:progress="10" />
+
 
                 </FrameLayout>
                 <TextView
@@ -197,10 +208,17 @@
                         style="@android:style/Widget.Material.Light.SeekBar"
                         android:layout_width="300dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center"
                         android:rotation="270"
                         android:progress="10"
-                        android:saveEnabled="false" />
+                        android:translationX="-5dp"
+                        android:thumb="@android:color/transparent"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:saveEnabled="false"
+                        android:foregroundGravity="left"
+                        android:layout_gravity="center"
+                        />
                     <SeekBar
                         android:id="@+id/sb_shoulder"
                         style="@android:style/Widget.Material.Light.SeekBar"
@@ -213,6 +231,9 @@
                         android:maxHeight="3dp"
                         android:minHeight="3dp"
                         android:progress="10" />
+
+
+
                 </FrameLayout>
 
                 <TextView
@@ -251,11 +272,17 @@
                         style="@android:style/Widget.Material.Light.SeekBar"
                         android:layout_width="300dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_centerInParent="true"
                         android:rotation="270"
                         android:progress="10"
-                        android:saveEnabled="false"/>
+                        android:translationX="-5dp"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:thumb="@android:color/transparent"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:saveEnabled="false"
+                        android:foregroundGravity="left"
+                        android:layout_gravity="center"
+                        />
                     <SeekBar
                         android:id="@+id/sb_back"
                         style="@android:style/Widget.Material.Light.SeekBar"
@@ -269,6 +296,7 @@
                         android:maxHeight="3dp"
                         android:minHeight="3dp"
                         android:progress="10" />
+
 
                 </FrameLayout>
 
@@ -307,11 +335,17 @@
                         style="@android:style/Widget.Material.Light.SeekBar"
                         android:layout_width="300dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_centerInParent="true"
                         android:rotation="270"
                         android:progress="10"
-                        android:saveEnabled="false" />
+                        android:translationX="-5dp"
+                        android:thumb="@android:color/transparent"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:saveEnabled="false"
+                        android:foregroundGravity="left"
+                        android:layout_gravity="center"
+                        />
                     <SeekBar
                         android:id="@+id/sb_weist"
                         style="@android:style/Widget.Material.Light.SeekBar"
@@ -325,6 +359,7 @@
                         android:maxHeight="3dp"
                         android:minHeight="3dp"
                         android:progress="10" />
+
 
                 </FrameLayout>
 
@@ -365,10 +400,17 @@
                         style="@android:style/Widget.Material.Light.SeekBar"
                         android:layout_width="300dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center"
                         android:rotation="270"
                         android:progress="10"
-                        android:saveEnabled="false" />
+                        android:translationX="-5dp"
+                        android:thumb="@android:color/transparent"
+                        android:progressDrawable="@drawable/draw_seekbar_reli"
+                        android:maxHeight="3dp"
+                        android:minHeight="3dp"
+                        android:saveEnabled="false"
+                        android:foregroundGravity="left"
+                        android:layout_gravity="center"
+                        />
                     <SeekBar
                         android:id="@+id/sb_butt"
                         style="@android:style/Widget.Material.Light.SeekBar"
