@@ -76,8 +76,8 @@ class Options : AppCompatActivity() {
                     mavpac = cmdconstructor.pack().encodePacket()
                 }
                 else return false
-                ssidjson.put("ssid", ssid)
-                ssidjson.put("password",password)
+                ssidjson.put("ssid",et_ssid.text.toString())
+                ssidjson.put("password",et_wifipwd.text.toString())
 
                 ssidfiletmp.appendText(ssidjson.toString() + "\n")
 
