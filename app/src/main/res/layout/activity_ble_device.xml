@@ -76,11 +76,12 @@ android:layout_height="match_parent">
         />
 
     <ImageButton
-        android:layout_width="10dp"
-        android:layout_height="20dp"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
         android:background="#00C9C9C9"
-        android:foreground="@drawable/back_button"
         android:onClick="clickback"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/back_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.05"

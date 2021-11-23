@@ -148,10 +148,14 @@ class bed_adjust : AppCompatActivity() {
     lateinit var ib_funmedi : ImageButton
     lateinit var iv_medistatus : ImageView
 //////medi on off
+/////
+    val normal_sleep_file = "normal.txt"
+    val side_sleep_file = "side.txt"
+
 
     ///////////seek bar for draw
-    lateinit var GREENBAR : Drawable
-    lateinit var PURPLEBAR : Drawable
+   // lateinit var GREENBAR : Drawable
+   // lateinit var PURPLEBAR : Drawable
 
 
     var sb_head: SeekBar? = null
@@ -245,6 +249,10 @@ class bed_adjust : AppCompatActivity() {
     }
 
 ////////command thread
+fun makesigned2unsigned(x : Short):Short{
+    if(x<0)return (x+65536).toShort()
+    else return x
+}
 fun get_timer():String{
     var tmp = ""
     if(Date().hours<10) tmp += "0" + Date().hours.toString()+ ":"
@@ -363,9 +371,9 @@ private val uiRunnable: Runnable = object : Runnable {
             CMD_MEDITATION->{
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                 val pos = com[1].toShort()
-                val level = com[2].toShort()
+                val level = makesigned2unsigned(com[2].toShort())
 
-                //////////TODO
+
                 try{
                     val mavpac = msg_meditation(0x55,bed_lrb.toShort(),pos,level)
                     publishmsg!!.setPayload(mavpac.pack().encodePacket())
@@ -796,8 +804,8 @@ private val uiRunnable: Runnable = object : Runnable {
         findloadview()
         extFile = File(storagePath, "command.txt")
         uihandle?.postDelayed(uiRunnable, 0)
-        GREENBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar_reli)
-        PURPLEBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar)
+        //GREENBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar_reli)
+        //PURPLEBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar)
         if(ble_cnt){
             mgatt!!.disconnect()
             mgatt!!.close()
@@ -1107,6 +1115,13 @@ private val uiRunnable: Runnable = object : Runnable {
 
     fun turn_relionoff(part : Int){
         /*
+        sb_head!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_neck!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_shoulder!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_weist!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_back!!.setProgressDrawableTiled(PURPLEBAR)
+        sb_butt!!.setProgressDrawableTiled(PURPLEBAR)
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             sb_head!!.setMaxHeight(3)
             sb_head!!.setMinHeight(3)
@@ -1121,13 +1136,6 @@ private val uiRunnable: Runnable = object : Runnable {
             sb_butt!!.setMaxHeight(3)
             sb_butt!!.setMinHeight(3)
         }
-
-        sb_head!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_neck!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_shoulder!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_weist!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_back!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_butt!!.setProgressDrawableTiled(PURPLEBAR)
         */
         if(FLAG_RELI_ONOFF){
             ///if RELI already on, turn if off

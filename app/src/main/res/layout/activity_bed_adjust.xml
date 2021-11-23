@@ -411,18 +411,19 @@
                         android:foregroundGravity="left"
                         android:layout_gravity="center"
                         />
+
                     <SeekBar
                         android:id="@+id/sb_butt"
                         style="@android:style/Widget.Material.Light.SeekBar"
                         android:layout_width="300dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:rotation="270"
-                        android:thumb="@drawable/bar_thumb"
-                        android:progressDrawable="@drawable/draw_seekbar"
                         android:maxHeight="3dp"
                         android:minHeight="3dp"
-                        android:progress="10"/>
+                        android:progress="10"
+                        android:progressDrawable="@drawable/draw_seekbar"
+                        android:rotation="270"
+                        android:thumb="@drawable/bar_thumb" />
 
                 </FrameLayout>
 
@@ -509,7 +510,18 @@
             app:layout_constraintVertical_bias="0.16"
             app:srcCompat="@drawable/bed_right"
             />
+        <ImageView
+            android:id = "@+id/iv_bleicn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
 
+            app:layout_constraintStart_toEndOf="@id/bed_icn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.99"
+            app:srcCompat="@drawable/bt_off" />
         <LinearLayout
             android:id = "@+id/ll_modechange"
             android:layout_width="wrap_content"
