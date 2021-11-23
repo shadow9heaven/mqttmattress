@@ -262,6 +262,31 @@ class ble_device : AppCompatActivity() {
         ) {
             //super.onCharacteristicRead(gatt, characteristic, status)
             Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
+            val data = characteristic!!.value
+            when(characteristic.uuid.toString()){
+                VER_MAC_UUID->{
+                    val ble_mac = byteArrayOf(data[4],data[5],data[6],data[7],data[8] ,data[9])
+                    val wifi_bytearray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
+
+                    var strtmp = ""
+                    for(i in wifi_bytearray){
+                        var j = i.toInt()
+                        if(j<0){
+                            j = j+256
+                        }
+                        strtmp += byte2str(j)
+                        strtmp += ":"
+                    }
+                    wifi_mac = strtmp.dropLast(1)
+                    Log.d("onVerMac",wifi_mac)
+                    //showmac()
+                }/////get version and mac
+                INFO_UUID->{
+                    Log.d("onINFO",data[0].toString())
+                }/////get info
+
+            }
+
         }
 
         override fun onCharacteristicWrite(
@@ -584,6 +609,7 @@ class ble_device : AppCompatActivity() {
             }
             false
         }
+        /*
         popupMenu.setOnDismissListener {
             Toast.makeText(
                 this@ble_device,
@@ -592,6 +618,7 @@ class ble_device : AppCompatActivity() {
             ).show()
         }
         popupMenu.show()
+        */
     }
 
 

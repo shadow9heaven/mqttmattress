@@ -56,18 +56,16 @@ class bed_adjust : AppCompatActivity() {
     val pos_5 = 0x05.toByte()
     val pos_6 = 0x06.toByte()
 
+//////for mqtt protocol
 
-    //////for mqtt protocol
     val TAG = "bed_adjust"
     var mqttclass : MqttClass? = MqttClass()
-
 
     val topic1 = "smttrss"
 
     val topic2 = arrayOf("control","sensor","ack","err","config","model","ota","else")
 
-    var wifi_mac = ""
-
+    //var wifi_mac = ""
     //var wifi_mac = "7c:df:a1:c2:96:ac"
 
 //////for mqtt protocol
@@ -75,9 +73,14 @@ class bed_adjust : AppCompatActivity() {
 /////FLAG
 
     var FLAG_CLICK_BED = false /////click the bed button
-    var FLAG_MEDI_ON = false  ///// true when mode 3 on
     var FLAG_AUTO_TUNE = false //////for body tune function ?
+
     var FLAG_RELI_ONOFF = false ///////true when mode 2 on
+    var FLAG_RELI_UPDOWN = false///////true when up, false when down
+
+    var FLAG_MEDI_ON = false  ///// true when mode 3 on
+
+
 /////FLAG
 
     lateinit var extFile: File
@@ -89,6 +92,7 @@ class bed_adjust : AppCompatActivity() {
     private val DATA_DIRECTORY = "LOG_DATA"
 
 ////number textview
+
     lateinit var res_head : TextView
     lateinit var res_neck : TextView
     lateinit var res_shoulder : TextView
@@ -98,6 +102,7 @@ class bed_adjust : AppCompatActivity() {
 
     lateinit var tv_pressure : TextView
     lateinit var tv_time :TextView
+
 ////number textview
 
 /////////////command
@@ -129,11 +134,13 @@ class bed_adjust : AppCompatActivity() {
 //////reli on off
 
     var reli_part = 1
-    var reli_level = 1
+    var reli_level = 10
 
+    val RELI_MAX = 10
+    val RELI_MIN = 5
 
-    val RELI_MAX = 5
-    val RELI_MIN = 1
+    var reli_timer = 10////// how many seconds to change up and down
+    var reli_count = 0  ////// change up and down when counter reach to 10
 
     lateinit var tv_medi_settime :TextView
     lateinit var ib_reli1 :ImageButton
@@ -142,12 +149,19 @@ class bed_adjust : AppCompatActivity() {
     lateinit var ib_reli4 :ImageButton
     lateinit var ib_reli5 :ImageButton
     lateinit var ib_reli6 :ImageButton
+
 //////reli on off
 
 //////medi on off
     lateinit var ib_funmedi : ImageButton
     lateinit var iv_medistatus : ImageView
-//////medi on off
+
+    var prev_weist = 5
+    var prev_butt = 5
+
+    val medi_level = 10.toByte()
+
+    //////medi on off
 /////
     val normal_sleep_file = "normal.txt"
     val side_sleep_file = "side.txt"
@@ -223,7 +237,6 @@ class bed_adjust : AppCompatActivity() {
                     val thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                     mqttclass!!.publish(thistopic, queue_cmd.first() , 1)
                     queue_retry++
-
                 }////need resend
                 else if(FLAG_MATTRESS_ACK || queue_retry > 2){
                     queue_cmd.poll()
@@ -244,9 +257,17 @@ class bed_adjust : AppCompatActivity() {
             else{
 
             }
-            Thread.sleep(1000)
+
+            if(FLAG_RELI_ONOFF){
+                ///if reli mode is on
+
+
+            }///if reli mode is on
+
+            sleep(1000)
         }
     }
+
 
 ////////command thread
 fun makesigned2unsigned(x : Short):Short{
@@ -767,37 +788,6 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
 
-    fun byte2str(input:Int):String{
-        var strtmp = ""
-        val higherB = input / 16
-        val lowerB = input % 16
-
-        var higherC:Char = num2char(higherB)
-        var lowerC :Char = num2char(lowerB)
-
-        return strtmp.plus(higherC).plus(lowerC)
-    }
-    fun num2char(a :Int):Char{
-        when(a){
-            15->return 'f'
-            14->return 'e'
-            13->return 'd'
-            12->return 'c'
-            11->return 'b'
-            10->return 'a'
-            9-> return '9'
-            8-> return '8'
-            7-> return '7'
-            6-> return '6'
-            5-> return '5'
-            4-> return '4'
-            3-> return '3'
-            2-> return '2'
-            1-> return '1'
-            0-> return '0'
-            else->return '0'
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1114,6 +1104,7 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
     fun turn_relionoff(part : Int){
+
         /*
         sb_head!!.setProgressDrawableTiled(PURPLEBAR)
         sb_neck!!.setProgressDrawableTiled(PURPLEBAR)
@@ -1137,6 +1128,7 @@ private val uiRunnable: Runnable = object : Runnable {
             sb_butt!!.setMinHeight(3)
         }
         */
+
         if(FLAG_RELI_ONOFF){
             ///if RELI already on, turn if off
             var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),0x00.toByte())
@@ -1149,6 +1141,7 @@ private val uiRunnable: Runnable = object : Runnable {
                 turn_relion()
             }
             else{
+
                 ///////turn off
                 FLAG_RELI_ONOFF = false
                 sb_head!!.alpha = 0.5f
@@ -1261,6 +1254,8 @@ private val uiRunnable: Runnable = object : Runnable {
             }
             false
         }
+
+        /*
         popupMenu.setOnDismissListener {
             Toast.makeText(
                 this,
@@ -1269,6 +1264,7 @@ private val uiRunnable: Runnable = object : Runnable {
             ).show()
         }
         popupMenu.show()
+        */
 
     }
 
@@ -1383,16 +1379,44 @@ private val uiRunnable: Runnable = object : Runnable {
             iv_medistatus.alpha = 0.5f
             FLAG_MEDI_ON = false
 
+            current_weist = prev_weist
+            current_butt = prev_butt
+
+
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
+                var com = byteArrayOf(bed_lrb.toByte(),pos_5,medi_level)
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
+                var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,medi_level)
+                mqttpublish(com2, CMD_ADJUST_HARDNESS)
+            }
+
         }// turn off
         else{
          ////turn on
             ib_funmedi.setImageResource(R.drawable.medi_stop)
             iv_medistatus.alpha = 1f
             FLAG_MEDI_ON = true
+            prev_weist = current_weist
+            prev_butt = current_butt
+            current_weist = 10
+            current_butt = 10
+
             if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT){
+
+                var com = byteArrayOf(bed_lrb.toByte(),pos_5,medi_level)
+                mqttpublish(com, CMD_ADJUST_HARDNESS)
+                var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,medi_level)
+                mqttpublish(com2, CMD_ADJUST_HARDNESS)
+
+            /*
                 val com = byteArrayOf(bed_lrb.toByte(),0x04.toByte(),0xFF.toByte())
                 mqttpublish(com,CMD_MEDITATION)
+
+            */
+
             }
+
+
         }//turn on
     }
 

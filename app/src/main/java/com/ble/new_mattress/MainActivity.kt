@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,8 @@ import java.lang.Thread.sleep
 
 //////ble
 var ble_cnt = false
+
+var wifi_mac = ""
 var bleaddress = ""
 var SavedBleAddr :String = ""
 
@@ -106,15 +109,61 @@ var bed_pressure = longArrayOf(
 val bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().bluetoothLeScanner
 
 /////global variable
+fun byte2str(input:Int):String{
+    var strtmp = ""
+    val higherB = input / 16
+    val lowerB = input % 16
+
+    var higherC:Char = num2char(higherB)
+    var lowerC :Char = num2char(lowerB)
+
+    return strtmp.plus(higherC).plus(lowerC)
+}
+
+fun num2char(a :Int):Char{
+    when(a){
+        15->return 'f'
+        14->return 'e'
+        13->return 'd'
+        12->return 'c'
+        11->return 'b'
+        10->return 'a'
+        9-> return '9'
+        8-> return '8'
+        7-> return '7'
+        6-> return '6'
+        5-> return '5'
+        4-> return '4'
+        3-> return '3'
+        2-> return '2'
+        1-> return '1'
+        0-> return '0'
+        else->return '0'
+    }
+}
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var reader : BufferedReader;
     lateinit var ib_ble :ImageButton
+    lateinit var tv_blemac :TextView
+    lateinit var tv_wifimac : TextView
+
+
 
     var FLAG_FOUNDDEVICE = false
     var bthHandler2: Handler? = Handler()
 
-    var uihandler: Handler? = Handler()
+    //var uihandler: Handler? = Handler()
+
+    fun showmac(){
+        runOnUiThread {
+            tv_blemac.text = this@MainActivity.getString(R.string.blemac) + bleaddress
+            tv_wifimac.text = this@MainActivity.getString(R.string.wifimac) + wifi_mac
+        }
+
+    }
+
 
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -125,7 +174,30 @@ class MainActivity : AppCompatActivity() {
         ) {
             //super.onCharacteristicRead(gatt, characteristic, status)
             Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
+            val data = characteristic!!.value
+            when(characteristic.uuid.toString()){
+                VER_MAC_UUID->{
+                    val ble_mac = byteArrayOf(data[4],data[5],data[6],data[7],data[8] ,data[9])
+                    val wifi_bytearray = byteArrayOf(data[10],data[11],data[12],data[13],data[14] ,data[15])
 
+                    var strtmp = ""
+                    for(i in wifi_bytearray){
+                        var j = i.toInt()
+                        if(j<0){
+                            j = j+256
+                        }
+                        strtmp += byte2str(j)
+                        strtmp += ":"
+                    }
+                    wifi_mac = strtmp.dropLast(1)
+                    Log.d("onVerMac",wifi_mac)
+                    showmac()
+                }/////get version and mac
+                INFO_UUID->{
+                    Log.d("onINFO",data[0].toString())
+                }/////get info
+
+            }
         }
 
         override fun onCharacteristicWrite(
@@ -160,14 +232,15 @@ class MainActivity : AppCompatActivity() {
             if(newState == 1 || newState == 2) {
                 mgatt!!.requestMtu(300)
                 sleep(2000)
-                Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
+                Log.e("TAG", "onConnectionStateChange (${gatt.device.address}) $newState status: $status");
+
+                gatt.discoverServices()
 
                 if (gatt == null) {
                     Log.e("TAG", "mBluetoothGatt not created!");
                     return;
                 }
                 else{
-                    gatt.discoverServices()
                 }
                 //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
 
@@ -445,9 +518,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun blesetting(){
 
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -464,11 +535,11 @@ class MainActivity : AppCompatActivity() {
                     builder.setMessage("Connect to " + bleaddress + " successful!")
                     builder.show()
                     ib_ble.setImageResource(R.drawable.bt_on)
+                    showmac()
                 }
             }/////ble device
             2 -> {
-
-
+                showmac()
             }/////bed adjust
             8 -> {
 
@@ -537,9 +608,10 @@ class MainActivity : AppCompatActivity() {
     fun findview(){
 
         ib_ble =findViewById(R.id.bt_ble)
+        tv_blemac = findViewById(R.id.tv_blemac)
+        tv_wifimac = findViewById(R.id.tv_wifimac)
 
     }
-
 
 
     fun clickbluetooth(view: View) {

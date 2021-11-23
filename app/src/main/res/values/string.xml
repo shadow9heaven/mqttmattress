@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">mattress</string>
+    <string name="blemac" translatable="false">ble mac:</string>
+    <string name="wifimac" translatable="false">wifi mac:</string>
+
     <string name="connected">(connected)</string>
     <string name="connect_alarm">device has connected</string>
 

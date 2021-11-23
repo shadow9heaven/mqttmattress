@@ -562,7 +562,7 @@
                         android:layout_width="30dp"
                         android:layout_height = "30dp"
                         android:background="@drawable/medi_time"
-                        android:text = "1"
+                        android:text = "10"
                         android:textStyle="bold"
                         android:textSize= "18dp"
                         android:gravity = "center"
