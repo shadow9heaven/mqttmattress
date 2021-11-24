@@ -136,11 +136,13 @@ class bed_adjust : AppCompatActivity() {
     var reli_part = 1
     var reli_level = 10
 
-    val RELI_MAX = 10
+    val RELI_MAX = 15
     val RELI_MIN = 5
 
     var reli_timer = 10////// how many seconds to change up and down
     var reli_count = 0  ////// change up and down when counter reach to 10
+
+
 
     lateinit var tv_medi_settime :TextView
     lateinit var ib_reli1 :ImageButton
@@ -254,15 +256,27 @@ class bed_adjust : AppCompatActivity() {
                 }///wait ack fail
 
             }////if queue has sth
-            else{
-
-            }
+            else{}///do nothing when queue is empty
 
             if(FLAG_RELI_ONOFF){
                 ///if reli mode is on
+                if(reli_count > reli_timer){
+                    reli_count = 0
+                    FLAG_RELI_UPDOWN = !FLAG_RELI_UPDOWN
+                    if(FLAG_RELI_UPDOWN){
+                        var com = byteArrayOf(bed_lrb.toByte(),reli_part.toByte(),reli_level.toByte())
+                        mqttpublish(com, CMD_ADJUST_HARDNESS)
+                    }///set to  up
+                    else{
+                        var com = byteArrayOf(bed_lrb.toByte(),reli_part.toByte(),0.toByte())
+                        mqttpublish(com, CMD_ADJUST_HARDNESS)
+                    }///set to down
 
+                }
+                else reli_count++
 
             }///if reli mode is on
+            else {}///if reli is off
 
             sleep(1000)
         }
