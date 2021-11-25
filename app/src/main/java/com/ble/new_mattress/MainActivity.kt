@@ -648,13 +648,6 @@ class MainActivity : AppCompatActivity() {
             }
             false
         }
-        popupMenu.setOnDismissListener {
-            Toast.makeText(
-                this@MainActivity,
-                "menu close.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
         popupMenu.show()
 
     }

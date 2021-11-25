@@ -48,6 +48,14 @@ class bed_adjust : AppCompatActivity() {
     val CMD_CONTROL_STEP = msg_control_step.MAVLINK_MSG_ID_CONTROL_STEP           ///61
     //////mavlink id
 
+    val AIRBAG_LEVEL = longArrayOf(
+            1677722,1950937,2224153,2497369,
+            2770585,3043801,3317017,3590233,
+            3863449,4136665,4409881,4683097,
+            4956313,5229528,5502744,5775960,
+            6049176,6322392,6595608,6868824
+    )
+
 /////position val
     val pos_1 = 0x01.toByte()
     val pos_2 = 0x02.toByte()
@@ -84,7 +92,6 @@ class bed_adjust : AppCompatActivity() {
 /////FLAG
 
     lateinit var extFile: File
-    var soundexist: Boolean = false
 
     lateinit var mediaPlayer: MediaPlayer
 
@@ -284,6 +291,16 @@ class bed_adjust : AppCompatActivity() {
 
 
 ////////command thread
+
+/////find
+
+fun findpressure (input : Long): Int{
+    for (i in 0..19)if(AIRBAG_LEVEL[i]> input)return i
+
+    return 19
+}
+
+
 fun makesigned2unsigned(x : Short):Short{
     if(x<0)return (x+65536).toShort()
     else return x
@@ -433,7 +450,7 @@ private val uiRunnable: Runnable = object : Runnable {
 
             CMD_CONTROL_PUMP->{
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
-                val mavpac = msg_control_pump(1)
+                val mavpac = msg_control_pump(com[0].toInt())
                 publishmsg!!.setPayload(mavpac.pack().encodePacket())
             }/////60
 
@@ -927,7 +944,6 @@ private val uiRunnable: Runnable = object : Runnable {
                     gatt.discoverServices()
                 }
                 //bluetoothDevice = bluetoothAdapter.getRemoteDevice(bleaddress)
-
                 //String address = device.getAddress();
                 Log.e("TAG", "onConnectionStateChange ($bleaddress) $newState status: $status");
             }
@@ -1073,9 +1089,10 @@ private val uiRunnable: Runnable = object : Runnable {
 
 
         FLAG_RELI_ONOFF = true
-        var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),reli_level.toByte())
-        if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT)mqttpublish(com, CMD_RELIEVE_STRESS)
-
+        if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
+            var com = byteArrayOf(0x55.toByte(), reli_part.toByte(), reli_level.toByte())
+            mqttpublish(com, CMD_RELIEVE_STRESS)
+        }
         sb_head!!.alpha = 0.5f
         sb_neck!!.alpha = 0.5f
         sb_shoulder!!.alpha = 0.5f
@@ -1119,34 +1136,15 @@ private val uiRunnable: Runnable = object : Runnable {
 
     fun turn_relionoff(part : Int){
 
-        /*
-        sb_head!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_neck!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_shoulder!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_weist!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_back!!.setProgressDrawableTiled(PURPLEBAR)
-        sb_butt!!.setProgressDrawableTiled(PURPLEBAR)
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            sb_head!!.setMaxHeight(3)
-            sb_head!!.setMinHeight(3)
-            sb_neck!!.setMaxHeight(3)
-            sb_neck!!.setMinHeight(3)
-            sb_shoulder!!.setMaxHeight(3)
-            sb_shoulder!!.setMinHeight(3)
-            sb_back!!.setMaxHeight(3)
-            sb_back!!.setMinHeight(3)
-            sb_weist!!.setMaxHeight(3)
-            sb_weist!!.setMinHeight(3)
-            sb_butt!!.setMaxHeight(3)
-            sb_butt!!.setMinHeight(3)
-        }
-        */
-
         if(FLAG_RELI_ONOFF){
             ///if RELI already on, turn if off
-            var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),0x00.toByte())
-            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT)mqttpublish(com, CMD_RELIEVE_STRESS)
+            //var com = byteArrayOf(0x55.toByte(),reli_part.toByte(),0x00.toByte())
+            //if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT)mqttpublish(com, CMD_RELIEVE_STRESS)
+
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT){
+                var com = byteArrayOf(0x00)
+                mqttpublish(com, CMD_CONTROL_PUMP)
+            }
 
             /////turn on if not the same part pressed
             if(part != reli_part){
@@ -1171,10 +1169,17 @@ private val uiRunnable: Runnable = object : Runnable {
     //////turn on
         else{
             /////set reli part and turn on
+            /////but first, turn off all pump
+            if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT){
+                var com = byteArrayOf(0x00)
+                mqttpublish(com, CMD_CONTROL_PUMP)
+            }
+            /////set reli part and turn on
             reli_part = part
             turn_relion()
         }/////else turn on
     }
+
     fun clickreli1(view: View) {
 
         turn_relionoff(1)
@@ -1201,9 +1206,7 @@ private val uiRunnable: Runnable = object : Runnable {
 
     }
     fun clickreli6(view: View) {
-
         turn_relionoff(6)
-
     }
     /*
     * triggered when relieve minus button is pressed
@@ -1238,6 +1241,7 @@ private val uiRunnable: Runnable = object : Runnable {
     */
     fun clickmenu(view: View) {
         ////menu
+
         val popupMenu = PopupMenu(this, view)
         popupMenu.getMenuInflater().inflate(R.menu.menu_bed, popupMenu.getMenu());
 
@@ -1250,35 +1254,14 @@ private val uiRunnable: Runnable = object : Runnable {
                     startActivity(intent)
                 }
                 R.id.back ->{
-                    if(soundexist){
-                        mediaPlayer.release()
-                    }
+
                     finish()
 
                 }
-                /*
-                R.id.exit -> {
-                    if(soundexist){
-                        mediaPlayer.release()
-                    }
-                    moveTaskToBack(true);
-                    exitProcess(-1)
-                }
-                */
             }
             false
         }
-
-        /*
-        popupMenu.setOnDismissListener {
-            Toast.makeText(
-                this,
-                "menu close.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
         popupMenu.show()
-        */
 
     }
 
@@ -1398,9 +1381,9 @@ private val uiRunnable: Runnable = object : Runnable {
 
 
             if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
-                var com = byteArrayOf(bed_lrb.toByte(),pos_5,medi_level)
+                var com = byteArrayOf(bed_lrb.toByte(),pos_5,current_weist.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
-                var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,medi_level)
+                var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,current_butt.toByte())
                 mqttpublish(com2, CMD_ADJUST_HARDNESS)
             }
 
