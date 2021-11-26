@@ -503,7 +503,7 @@ class ble_device : AppCompatActivity() {
                     // hashMap.put("name", CD.name + "(connected)")
                     // hashMap.put("misc", CD.address)
                     val hashMap: java.util.HashMap<String, String> = java.util.HashMap()
-                    hashMap.put("name", CD.name + "(已連接)")
+                    hashMap.put("name", CD.name + this.getString(R.string.connected))
                     hashMap.put("misc", CD.address)
                     if (!BLE_nameList.contains(hashMap)){
                         BLE_nameList += hashMap
@@ -609,6 +609,7 @@ class ble_device : AppCompatActivity() {
             }
             false
         }
+        popupMenu.show()
         /*
         popupMenu.setOnDismissListener {
             Toast.makeText(
@@ -617,7 +618,6 @@ class ble_device : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
-        popupMenu.show()
         */
     }
 

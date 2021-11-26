@@ -535,7 +535,10 @@ class MainActivity : AppCompatActivity() {
                     builder.setMessage("Connect to " + bleaddress + " successful!")
                     builder.show()
                     ib_ble.setImageResource(R.drawable.bt_on)
-                    showmac()
+                    Thread{
+                        sleep(3000)
+                        showmac()
+                    }.start()
                 }
             }/////ble device
             2 -> {

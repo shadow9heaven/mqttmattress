@@ -122,7 +122,7 @@ class bed_adjust : AppCompatActivity() {
     lateinit var bed_btn :ImageView
     lateinit var bed_icn :ImageView
     lateinit var iv_bleicn :ImageView
-
+    lateinit var bt_bodymove1 :Button
 /////////left or right
 
 
@@ -815,6 +815,7 @@ private val uiRunnable: Runnable = object : Runnable {
     fun findviewID4(){
         setContentView(R.layout.activity_body_move)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        bt_bodymove1 = findViewById(R.id.bt_bodymove1)
 
     }
 
@@ -1181,29 +1182,19 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
     fun clickreli1(view: View) {
-
         turn_relionoff(1)
-
     }
     fun clickreli2(view: View) {
-
         turn_relionoff(2)
-
     }
     fun clickreli3(view: View) {
-
         turn_relionoff(3)
-
     }
     fun clickreli4(view: View) {
-
         turn_relionoff(4)
-
     }
     fun clickreli5(view: View) {
-
         turn_relionoff(5)
-
     }
     fun clickreli6(view: View) {
         turn_relionoff(6)
@@ -1241,7 +1232,6 @@ private val uiRunnable: Runnable = object : Runnable {
     */
     fun clickmenu(view: View) {
         ////menu
-
         val popupMenu = PopupMenu(this, view)
         popupMenu.getMenuInflater().inflate(R.menu.menu_bed, popupMenu.getMenu());
 
@@ -1369,6 +1359,7 @@ private val uiRunnable: Runnable = object : Runnable {
         findviewID4()
     }
 
+    ////////click fragment change
     fun clickfunmedi(view: View) {
         if(FLAG_MEDI_ON){
          ////turn off
@@ -1418,11 +1409,12 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
     fun clicktraining(view: View) {
+        ///save normal and side sleep to  bed_pressure
+
 
     }
 
 
-////////click fragment change
 
 
 
