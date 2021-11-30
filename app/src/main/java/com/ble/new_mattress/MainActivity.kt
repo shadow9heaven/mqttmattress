@@ -230,6 +230,11 @@ class MainActivity : AppCompatActivity() {
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if(newState == 1 || newState == 2) {
+                runOnUiThread {  ib_ble.setImageResource(R.drawable.bt_on)
+                    val builder = AlertDialog.Builder(this@MainActivity)
+                    builder.setMessage("Connect to " + bleaddress + " successful!")
+                    builder.show()
+                }
                 mgatt!!.requestMtu(300)
                 sleep(2000)
                 Log.e("TAG", "onConnectionStateChange (${gatt.device.address}) $newState status: $status");
@@ -284,11 +289,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 CHARACTERISTIC_DATA!!.getDescriptors().last()-> {
-                    runOnUiThread {  ib_ble.setImageResource(R.drawable.bt_on)
-                        val builder = AlertDialog.Builder(this@MainActivity)
-                        builder.setMessage("Connect to " + bleaddress + " successful!")
-                        builder.show()
-                    }
+
                     mgatt!!.readCharacteristic(CHARACTERISTIC_VER_MAC)
                     /////get mac and version first
                     //send_commandbyBle(byteArrayOf(0x03), CMD_BLUETOOTH_CONNECT )
@@ -392,6 +393,8 @@ class MainActivity : AppCompatActivity() {
 
             if(result!!.device.address == SavedBleAddr && !FLAG_FOUNDDEVICE && !ble_cnt) {
                 FLAG_FOUNDDEVICE = true
+
+
                 mgatt = result!!.device.connectGatt(
                     applicationContext,
                     false,
@@ -400,7 +403,6 @@ class MainActivity : AppCompatActivity() {
                 SystemClock.sleep(500)
                 if (bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != STATE_DISCONNECTED &&
                     bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != BluetoothProfile.STATE_DISCONNECTING) {
-
                     ble_cnt = true
                     bleaddress = SavedBleAddr
                     bluetoothDevice = result!!.device
@@ -483,6 +485,10 @@ class MainActivity : AppCompatActivity() {
             mqttjson.put("mqttpwd", mqttlist[2])
             mqttfile.appendText(mqttjson.toString() + "\n")
         }
+
+        serverURL = mqttjson.getString("server")
+        mqttuser  = mqttjson.getString("mqttuser")
+        mqttpwd =   mqttjson.getString("mqttpwd")
 
         try{
             bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager

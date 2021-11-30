@@ -221,6 +221,16 @@ class Options : AppCompatActivity() {
     fun clicksetserver(view: View) {
         if(ble_cnt){
             send_commandbyBle(CMD_SET_IP_PWD)
+
+            ////////////refresh new mqtt setting
+            var mqttfile = File(storagePath,mqttserverfile)
+            mqttfile.createNewFile()
+            ////write default mqtt server file
+            mqttfile.appendText(mqttjson.toString() + "\n")
+
+            serverURL = mqttjson.getString("server")
+            mqttuser  = mqttjson.getString("mqttuser")
+            mqttpwd =   mqttjson.getString("mqttpwd")
         }
         else{
             Toast.makeText(
@@ -243,6 +253,7 @@ class Options : AppCompatActivity() {
         }
     }////click ble set to new wifi
     fun clickback(view: View) {
+
         setResult(RESULT_OK)
         finish()
     }
