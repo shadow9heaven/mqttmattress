@@ -38,7 +38,7 @@ class Options : AppCompatActivity() {
     val CMD_SET_SSID   = msg_wifi_set_ssid_password.MAVLINK_MSG_ID_WIFI_SET_SSID_PASSWORD              ///32
     val CMD_SET_IP_PWD = msg_mqtt_set_ip_password.MAVLINK_MSG_ID_MQTT_SET_IP_PASSWORD              ///33
     val CMD_SET_WIFI_CONNECT = msg_connect.MAVLINK_MSG_ID_CONNECT    ///34
-
+    var ssidfiletmp = File(storagePath, ssidfile)
     /*
     val BA_mqttIP = serverURL.toByteArray(Charsets.US_ASCII)
     val BA_mqttuser = mqttuser.toByteArray(Charsets.US_ASCII)
@@ -53,9 +53,8 @@ class Options : AppCompatActivity() {
 
         when(msgid){
             CMD_SET_SSID->{
-                var ssidfiletmp = File(storagePath,ssidfile)
-                //ssidfiletmp.delete()
-                ssidfiletmp.createNewFile()
+
+
                 val ssidstring = et_ssid.text.toString().toByteArray(Charsets.US_ASCII)
                 val pwdstring = et_wifipwd.text.toString().toByteArray(Charsets.US_ASCII)
 
@@ -75,7 +74,8 @@ class Options : AppCompatActivity() {
                     mavpac = cmdconstructor.pack().encodePacket()
                 }
                 else return false
-
+                ssidfiletmp.deleteRecursively()
+                ssidfiletmp.createNewFile()
                 ssidjson.put("ssid",et_ssid.text.toString())
                 ssidjson.put("password",et_wifipwd.text.toString())
                 ssidfiletmp.appendText(ssidjson.toString() + "\n")
@@ -152,7 +152,7 @@ class Options : AppCompatActivity() {
         et_ssid = findViewById(R.id.et_ssid)
         et_wifipwd = findViewById(R.id.et_wifipwd)
 
-        var ssidfiletmp = File(storagePath, ssidfile)
+
 
         try {
             val ssidtmp = ssidfiletmp.readText()
