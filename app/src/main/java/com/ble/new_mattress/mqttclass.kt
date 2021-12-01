@@ -184,7 +184,6 @@ class MqttClass {
                 FLAG_MQTT_CONNECT = false
 
             }
-
             override fun deliveryComplete(token: IMqttDeliveryToken?) {
 
             }
@@ -204,6 +203,7 @@ class MqttClass {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d(TAG, "Connection success")
                     FLAG_WIFI_CONNECT = true
+                    FLAG_MQTT_CONNECT = true
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {

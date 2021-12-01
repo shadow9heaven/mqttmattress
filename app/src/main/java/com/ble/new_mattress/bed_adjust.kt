@@ -93,7 +93,7 @@ class bed_adjust : AppCompatActivity() {
 
     lateinit var extFile: File
 
-    lateinit var mediaPlayer: MediaPlayer
+    ///lateinit var mediaPlayer: MediaPlayer
 
     var mode = "cohe"
     private val DATA_DIRECTORY = "LOG_DATA"
@@ -125,7 +125,6 @@ class bed_adjust : AppCompatActivity() {
     lateinit var bt_bodymove1 :Button
 /////////left or right
 
-
     ///////////mode button
 ///////////mode button
 
@@ -148,7 +147,6 @@ class bed_adjust : AppCompatActivity() {
 
     var reli_timer = 10////// how many seconds to change up and down
     var reli_count = 0  ////// change up and down when counter reach to 10
-
 
 
     lateinit var tv_medi_settime :TextView
@@ -333,12 +331,11 @@ private val uiRunnable: Runnable = object : Runnable {
 
                 pressure_str = pressure_str.dropLast(1)
                 try{
-
                     tv_pressure.text = pressure_str
                     tv_time.text = get_timer()
                 }
                 catch(e:Exception){
-
+                    Log.e("uithread",e.message!!)
                 }
                 if(FLAG_MQTT_CONNECT)iv_bleicn.setImageResource(R.drawable.bt_on)
                 else iv_bleicn.setImageResource(R.drawable.bt_off)
@@ -362,10 +359,18 @@ private val uiRunnable: Runnable = object : Runnable {
         Thread{
             mqttclass!!.connect(this, serverurl4phone, mqttuser, mqttpwd)
             sleep(5000)
-            runOnUiThread{findviewID1()}
-            mqttsub()
-            FLAG_MQTT_CONNECT = true
-            cmdthread.start()
+            runOnUiThread {
+                findviewID1()
+                uihandle?.postDelayed(uiRunnable, 0)
+            }
+            if(FLAG_MQTT_CONNECT){
+                mqttsub()
+                cmdthread.start()
+            }
+            else{}
+/*
+
+*/
         }.start()
     }
 
@@ -625,7 +630,7 @@ private val uiRunnable: Runnable = object : Runnable {
         }
     }//////back draggable
 
-    val tune_weist    = object : SeekBar.OnSeekBarChangeListener{
+    val tune_weist = object : SeekBar.OnSeekBarChangeListener{
         override fun onStartTrackingTouch(seekBar: SeekBar?){
         }
 
@@ -824,22 +829,29 @@ private val uiRunnable: Runnable = object : Runnable {
         super.onCreate(savedInstanceState)
         findloadview()
         extFile = File(storagePath, "command.txt")
-        uihandle?.postDelayed(uiRunnable, 0)
+
+
+        try{
+            if(bluetoothDevice != null) ble_cnt = true
+        }
+        catch(e : Exception){}
+
         //GREENBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar_reli)
         //PURPLEBAR  = this@bed_adjust.getResources().getDrawable(R.drawable.draw_seekbar)
         if(ble_cnt){
             mgatt!!.disconnect()
             mgatt!!.close()
             sleep(500)
-            mgatt = bluetoothDevice.connectGatt(
+            mgatt = bluetoothDevice?.connectGatt(
                 applicationContext,
                 false,
                 gattCallback
             )
-            findviewID1()
+
         }
         else{
             findviewID1()
+            uihandle?.postDelayed(uiRunnable, 0)
         }
 
     }
