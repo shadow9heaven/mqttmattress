@@ -88,7 +88,7 @@ class Options : AppCompatActivity() {
 
             }/////32 set wifi ssid
             CMD_SET_IP_PWD->{
-                val ipstring = mqttjson.getString("server").toByteArray(Charsets.US_ASCII)
+                val ipstring = ("mqtt://" + mqttjson.getString("server")).toByteArray(Charsets.US_ASCII)
                 val userstring = mqttjson.getString("mqttuser").toByteArray(Charsets.US_ASCII)
                 val pwdstring = mqttjson.getString("mqttpwd").toByteArray(Charsets.US_ASCII)
 

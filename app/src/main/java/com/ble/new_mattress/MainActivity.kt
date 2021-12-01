@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             if(newState == 1 || newState == 2) {
                 runOnUiThread {  ib_ble.setImageResource(R.drawable.bt_on)
                     val builder = AlertDialog.Builder(this@MainActivity)
-                    builder.setMessage("Connect to " + bleaddress + " successful!")
+                    builder.setMessage("Connection " + bleaddress + " successful!")
                     builder.show()
                 }
                 mgatt!!.requestMtu(300)
@@ -525,7 +525,7 @@ class MainActivity : AppCompatActivity() {
             1 -> {
                 if (resultCode == RESULT_OK) {
                     val builder = AlertDialog.Builder(this@MainActivity)
-                    builder.setMessage("Connect to " + bleaddress + " successful!")
+                    builder.setMessage("Connection " + bleaddress + " successful!")
                     builder.show()
                     ib_ble.setImageResource(R.drawable.bt_on)
                     Thread{

@@ -65,7 +65,7 @@ class bed_adjust : AppCompatActivity() {
     val pos_6 = 0x06.toByte()
 
 //////for mqtt protocol
-    var serverurl4phone = "tcp" + serverURL.drop(4)
+    var serverurl4phone = "tcp://" + serverURL
     val TAG = "bed_adjust"
     var mqttclass : MqttClass? = MqttClass()
 
