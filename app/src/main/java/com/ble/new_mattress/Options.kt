@@ -80,6 +80,12 @@ class Options : AppCompatActivity() {
                 ssidjson.put("password",et_wifipwd.text.toString())
                 ssidfiletmp.appendText(ssidjson.toString() + "\n")
 
+                Toast.makeText(
+                        this@Options,
+                        "ssid set successful",
+                        Toast.LENGTH_SHORT
+                ).show()
+
             }/////32 set wifi ssid
             CMD_SET_IP_PWD->{
                 val ipstring = mqttjson.getString("server").toByteArray(Charsets.US_ASCII)
@@ -112,6 +118,11 @@ class Options : AppCompatActivity() {
                     mavpac = cmdconstructor.pack().encodePacket()
                 }
                 else return false
+                Toast.makeText(
+                        this@Options,
+                        "mqtt set successful",
+                        Toast.LENGTH_SHORT
+                ).show()
 
             }/////33 set mqtt ip password
             CMD_SET_WIFI_CONNECT->{
@@ -245,14 +256,6 @@ class Options : AppCompatActivity() {
     fun clicksetssid(view: View) {
         if(ble_cnt){
             send_commandbyBle(CMD_SET_SSID)
-////
-            /*
-            ssidjson.put("ssid",et_ssid.text.toString())
-            ssidjson.put("password",et_wifipwd.text.toString())
-            var ssidfiletmp = File(storagePath, ssidfile)
-            ssidfiletmp.createNewFile()
-            ssidfiletmp.appendText(ssidjson.toString() + "\n")
-            */
 
         }
         else{

@@ -400,9 +400,6 @@ class MainActivity : AppCompatActivity() {
                     false,
                     gattCallback
                 )
-                SystemClock.sleep(500)
-                if (bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != STATE_DISCONNECTED &&
-                    bluetoothManager?.getConnectionState(mgatt?.device, BluetoothProfile.GATT) != BluetoothProfile.STATE_DISCONNECTING) {
                     ble_cnt = true
                     bleaddress = SavedBleAddr
                     bluetoothDevice = result!!.device
@@ -416,9 +413,6 @@ class MainActivity : AppCompatActivity() {
                     */
 
                     FLAG_FOUNDDEVICE = false
-
-                }
-
             }///try to connect
 
         }
