@@ -65,7 +65,7 @@ class bed_adjust : AppCompatActivity() {
     val pos_6 = 0x06.toByte()
 
 //////for mqtt protocol
-
+    var serverurl4phone = "tcp" + serverURL.drop(4)
     val TAG = "bed_adjust"
     var mqttclass : MqttClass? = MqttClass()
 
@@ -360,8 +360,8 @@ private val uiRunnable: Runnable = object : Runnable {
 
     fun mqttconnect() {
         Thread{
-            mqttclass!!.connect(this, serverURL, mqttuser, mqttpwd)
-            Thread.sleep(5000)
+            mqttclass!!.connect(this, serverurl4phone, mqttuser, mqttpwd)
+            sleep(5000)
             runOnUiThread{findviewID1()}
             mqttsub()
             FLAG_MQTT_CONNECT = true
@@ -397,8 +397,7 @@ private val uiRunnable: Runnable = object : Runnable {
                 publishmsg!!.setPayload(mavpac.pack().encodePacket())
 
             }/////34
-
-            ////for smart ress
+            ////for smart mattress
             CMD_ADJUST_HARDNESS->{
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                 val pos  = com[1].toShort()
