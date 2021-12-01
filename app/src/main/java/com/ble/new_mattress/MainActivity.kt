@@ -239,6 +239,10 @@ class MainActivity : AppCompatActivity() {
                 sleep(2000)
                 Log.e("TAG", "onConnectionStateChange (${gatt.device.address}) $newState status: $status");
 
+                ble_cnt = true
+                bleaddress = SavedBleAddr
+
+
                 gatt.discoverServices()
 
                 if (gatt == null) {
@@ -394,23 +398,12 @@ class MainActivity : AppCompatActivity() {
             if(result!!.device.address == SavedBleAddr && !FLAG_FOUNDDEVICE && !ble_cnt) {
                 FLAG_FOUNDDEVICE = true
 
-
                 mgatt = result!!.device.connectGatt(
                     applicationContext,
                     false,
                     gattCallback
                 )
-                    ble_cnt = true
-                    bleaddress = SavedBleAddr
-                    bluetoothDevice = result!!.device
-
-                    /*
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Connect to " + bleaddress + "!!",
-                        Toast.LENGTH_SHORT
-                    )
-                    */
+                bluetoothDevice = result!!.device
 
                     FLAG_FOUNDDEVICE = false
             }///try to connect
