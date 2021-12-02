@@ -125,7 +125,9 @@ class bed_adjust : AppCompatActivity() {
     lateinit var bt_bodymove1 :Button
 /////////left or right
 
-    ///////////mode button
+///////////mode button
+
+
 ///////////mode button
 
 /////cohe timer
@@ -185,6 +187,15 @@ class bed_adjust : AppCompatActivity() {
     var sb_back: SeekBar? = null
     var sb_weist: SeekBar? = null
     var sb_butt: SeekBar? = null
+
+    var wb_head: SeekBar? = null
+    var wb_neck: SeekBar? = null
+    var wb_shoulder: SeekBar? = null
+    var wb_back: SeekBar? = null
+    var wb_weist: SeekBar? = null
+    var wb_butt: SeekBar? = null
+
+
 //////////////seek bar for draw
     lateinit var num_head : TextView
     lateinit var num_neck : TextView
@@ -287,7 +298,6 @@ class bed_adjust : AppCompatActivity() {
         }
     }
 
-
 ////////command thread
 
 /////find
@@ -333,6 +343,10 @@ private val uiRunnable: Runnable = object : Runnable {
                 try{
                     tv_pressure.text = pressure_str
                     tv_time.text = get_timer()
+                    ///////set seekbar level
+                    // val setprogess = findpressure(pressure) * 5
+
+                    ///////set seekbar level
                 }
                 catch(e:Exception){
                     Log.e("uithread",e.message!!)
@@ -340,6 +354,7 @@ private val uiRunnable: Runnable = object : Runnable {
                 if(FLAG_MQTT_CONNECT)iv_bleicn.setImageResource(R.drawable.bt_on)
                 else iv_bleicn.setImageResource(R.drawable.bt_off)
             }
+
             else {
 
             }
@@ -357,8 +372,14 @@ private val uiRunnable: Runnable = object : Runnable {
 
     fun mqttconnect() {
         Thread{
+            var retry =0
             mqttclass!!.connect(this, serverurl4phone, mqttuser, mqttpwd)
-            sleep(5000)
+            while(!FLAG_MQTT_CONNECT && retry < 5){
+                sleep(1000)
+                retry++
+            }
+
+
             runOnUiThread {
                 findviewID1()
                 uihandle?.postDelayed(uiRunnable, 0)
@@ -428,7 +449,6 @@ private val uiRunnable: Runnable = object : Runnable {
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                 val pos = com[1].toShort()
                 val level = makesigned2unsigned(com[2].toShort())
-
 
                 try{
                     val mavpac = msg_meditation(0x55,bed_lrb.toShort(),pos,level)
@@ -696,20 +716,21 @@ private val uiRunnable: Runnable = object : Runnable {
         num_butt =findViewById(R.id.num_butt)
 
         /////disable watchbar first
-        sb_head = findViewById(R.id.wb_head);
-        sb_neck = findViewById(R.id.wb_neck);
-        sb_shoulder = findViewById(R.id.wb_shoulder);
-        sb_back = findViewById(R.id.wb_back);
-        sb_weist = findViewById(R.id.wb_weist);
-        sb_butt = findViewById(R.id.wb_butt);
+        wb_head = findViewById(R.id.wb_head);
+        wb_neck = findViewById(R.id.wb_neck);
+        wb_shoulder = findViewById(R.id.wb_shoulder);
+        wb_back = findViewById(R.id.wb_back);
+        wb_weist = findViewById(R.id.wb_weist);
+        wb_butt = findViewById(R.id.wb_butt);
 /////////
-        sb_head?.setEnabled(false)
-        sb_neck?.setEnabled(false)
-        sb_shoulder?.setEnabled(false)
-        sb_back?.setEnabled(false)
-        sb_weist?.setEnabled(false)
-        sb_butt?.setEnabled(false)
+        wb_head?.setEnabled(false)
+        wb_neck?.setEnabled(false)
+        wb_shoulder?.setEnabled(false)
+        wb_back?.setEnabled(false)
+        wb_weist?.setEnabled(false)
+        wb_butt?.setEnabled(false)
 //////////
+
 
         tv_pressure = findViewById(R.id.tv_pressure)
         tv_time = findViewById(R.id.tv_time)
