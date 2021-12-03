@@ -256,6 +256,7 @@ class bed_adjust : AppCompatActivity() {
                 if(queue_resend >3 && !FLAG_MATTRESS_ACK){
                     /////need resend
                     val thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
+
                     mqttclass!!.publish(thistopic, queue_cmd.first() , 1)
                     queue_retry++
                     queue_resend = 0
@@ -348,6 +349,7 @@ private val uiRunnable: Runnable = object : Runnable {
                 try{
                     tv_pressure.text = pressure_str
                     tv_time.text = get_timer()
+                    if(queue_cmd.size >0)tv_publish.text = queue_cmd.first().payload.decodeToString()
                     ///////set seekbar level
                     // val setprogess = findpressure(pressure) * 5
 
