@@ -35,7 +35,6 @@ class MqttClass {
                 val message2UByte = message!!.payload
 
                 //Log.d(TAG, "Receive message2ubyte: ${message2UByte} from topic: $topic")
-                //val parsedByteArray =
                 var mvlnk_partest = Parser()
                 var parsertmp :MAVLinkPacket ?= null
                 for(i in message2UByte){
