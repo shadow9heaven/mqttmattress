@@ -437,10 +437,20 @@
             </LinearLayout>
         </LinearLayout>
 
-
-
         <TextView
-            android:id="@+id/tv_pressure"
+            android:id="@+id/tv_time"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3" />
+        <TextView
+            android:id="@+id/tv_publish"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -454,7 +464,7 @@
             />
 
         <TextView
-            android:id="@+id/tv_time"
+            android:id="@+id/tv_pressure"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -463,8 +473,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.9"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.3" />
+            app:layout_constraintTop_toBottomOf="@id/tv_publish"
+            app:layout_constraintVertical_bias="0.02"
+            />
+
+
 
         <ImageView
             android:id = "@+id/bed_icn"

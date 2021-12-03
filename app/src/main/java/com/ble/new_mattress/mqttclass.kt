@@ -22,7 +22,7 @@ import com.ble.new_mattress.bed_pressure
 class MqttClass {
     var mqttClient :MqttAndroidClient? = null
     val TAG = "MqttClass"
-
+    var FLAG_ACK_GET = false
 
     fun connect(context: Context, URL : String, clientID : String, password : String) {
         //val serverURI = "tcp://broker.emqx.io:1883"

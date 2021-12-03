@@ -30,6 +30,7 @@ import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.view.WindowManager
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.w3c.dom.Text
 import java.lang.Exception
 import java.lang.Thread.sleep
 
@@ -88,6 +89,7 @@ class bed_adjust : AppCompatActivity() {
 
     var FLAG_MEDI_ON = false  ///// true when mode 3 on
 
+    //var FLAG_ACK_BACK = false //// true when ack back
 
 /////FLAG
 
@@ -108,6 +110,7 @@ class bed_adjust : AppCompatActivity() {
     lateinit var res_butt : TextView
 
     lateinit var tv_pressure : TextView
+    lateinit var tv_publish : TextView
     lateinit var tv_time :TextView
 
 ////number textview
@@ -249,12 +252,13 @@ class bed_adjust : AppCompatActivity() {
 
         while(FLAG_MQTT_CONNECT){
             if(queue_cmd.size>0){
-                queue_resend++
+
                 if(queue_resend >3 && !FLAG_MATTRESS_ACK){
                     /////need resend
                     val thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
                     mqttclass!!.publish(thistopic, queue_cmd.first() , 1)
                     queue_retry++
+                    queue_resend = 0
                 }////need resend
                 else if(FLAG_MATTRESS_ACK || queue_retry > 2){
                     queue_cmd.poll()
@@ -269,6 +273,7 @@ class bed_adjust : AppCompatActivity() {
                     FLAG_MATTRESS_ACK = false
                 }////send success or give up
                 else {
+                    queue_resend++
                 }///wait ack fail
 
             }////if queue has sth
@@ -372,27 +377,29 @@ private val uiRunnable: Runnable = object : Runnable {
 
     fun mqttconnect() {
         Thread{
-            var retry =0
             mqttclass!!.connect(this, serverurl4phone, mqttuser, mqttpwd)
-            while(!FLAG_MQTT_CONNECT && retry < 5){
+        }.start()
+        var retry =0
+            while(!FLAG_MQTT_CONNECT && retry < 10){
+                Log.e("mqtt connect","retry " + retry.toString())
                 sleep(1000)
                 retry++
             }
 
+        runOnUiThread {
+            findviewID1()
+            uihandle?.postDelayed(uiRunnable, 0)
+        }
 
-            runOnUiThread {
-                findviewID1()
-                uihandle?.postDelayed(uiRunnable, 0)
-            }
-            if(FLAG_MQTT_CONNECT){
+        if(FLAG_MQTT_CONNECT){
                 mqttsub()
                 cmdthread.start()
-            }
+        }
             else{}
 /*
 
 */
-        }.start()
+
     }
 
     fun mqttdisconnect(){
@@ -733,6 +740,7 @@ private val uiRunnable: Runnable = object : Runnable {
 
 
         tv_pressure = findViewById(R.id.tv_pressure)
+        tv_publish = findViewById(R.id.tv_publish)
         tv_time = findViewById(R.id.tv_time)
 
         res_head = findViewById(R.id.texthead)
