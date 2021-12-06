@@ -889,6 +889,17 @@ private val uiRunnable: Runnable = object : Runnable {
 
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG,"onStop")
+        try{
+            mqttclass!!.mqttClient!!.unregisterResources()
+        }
+        catch(e :Exception){
+            Log.e(TAG,"mqttclient is null")
+        }
+
+    }
     override fun onDestroy() {
         super.onDestroy()
         try{
@@ -905,7 +916,6 @@ private val uiRunnable: Runnable = object : Runnable {
         uihandle.removeCallbacks(uiRunnable)
 
         FLAG_MQTT_CONNECT = false
-
 
     }
 

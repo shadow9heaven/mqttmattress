@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <!--GPS-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -33,7 +34,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Mattress">
         <activity android:name=".change_new_server"></activity>
-        <activity android:name=".Options" />
+        <activity android:name=".Options"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".bed_adjust"
             android:screenOrientation="landscape"
