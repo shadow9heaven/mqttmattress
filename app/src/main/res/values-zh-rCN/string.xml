@@ -3,7 +3,7 @@
     <string name="app_name">mattress</string>
     <string name="connected">(已连接)</string>
     <string name="connect_alarm">蓝芽已连接</string>
-
+    <string name="version">版本:</string>
     <string name="back2title">返回主画面</string>
 
     <string name="adjust_hard">调整</string>

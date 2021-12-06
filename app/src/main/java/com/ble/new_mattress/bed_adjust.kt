@@ -304,12 +304,10 @@ class bed_adjust : AppCompatActivity() {
     }
 
 ////////command thread
-
 /////find
 
 fun findpressure (input : Long): Int{
     for (i in 0..19)if(AIRBAG_LEVEL[i]> input)return i
-
     return 19
 }
 
@@ -400,9 +398,6 @@ private val uiRunnable: Runnable = object : Runnable {
                 cmdthread.start()
         }
             else{}
-/*
-
-*/
 
     }
 
@@ -898,7 +893,6 @@ private val uiRunnable: Runnable = object : Runnable {
         catch(e :Exception){
             Log.e(TAG,"mqttclient is null")
         }
-
     }
     override fun onDestroy() {
         super.onDestroy()

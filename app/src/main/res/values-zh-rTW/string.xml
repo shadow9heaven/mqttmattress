@@ -3,7 +3,7 @@
     <string name="app_name">mattress</string>
     <string name="connected">(已連接)</string>
     <string name="connect_alarm">成功連接床墊</string>
-
+    <string name="version">版本:</string>
     <string name="back2title">返回主畫面</string>
 
     <string name="adjust_hard">調整</string>

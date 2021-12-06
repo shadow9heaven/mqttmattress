@@ -3,7 +3,7 @@
     <string name="app_name">mattress</string>
     <string name="connected">(connected)</string>
     <string name="connect_alarm">device has connected</string>
-
+    <string name="version">version:</string>
     <string name="back2title">back to title</string>
 
     <string name="adjust_hard">adjust</string>
