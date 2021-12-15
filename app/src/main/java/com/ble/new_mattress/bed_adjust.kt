@@ -852,7 +852,6 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         findloadview()
@@ -1328,7 +1327,6 @@ private val uiRunnable: Runnable = object : Runnable {
             current_butt = set_lbutt
 
 
-
             bed_lrb = 1
 
             ///UI set
@@ -1463,8 +1461,22 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
 
-
-
+    var FLAG_CONTROL_PUMP = false
+    fun clickpump(view: View) {
+        /////press to start up the pump or close
+        if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
+            if(!FLAG_CONTROL_PUMP){
+                var com = byteArrayOf(0x06)
+                mqttpublish(com, CMD_CONTROL_PUMP)
+                FLAG_CONTROL_PUMP = true
+            }
+            else{
+                var com = byteArrayOf(0x00)
+                mqttpublish(com, CMD_CONTROL_PUMP)
+                FLAG_CONTROL_PUMP = false
+            }
+        }
+    }
 
 
 }
