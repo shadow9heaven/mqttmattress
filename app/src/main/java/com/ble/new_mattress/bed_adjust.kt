@@ -480,7 +480,8 @@ private val uiRunnable: Runnable = object : Runnable {
 
             CMD_CONTROL_PUMP->{
                 thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
-                val mavpac = msg_control_pump(com[0].toInt())
+                val mavpac = msg_control_pump(com[0].toInt()* 0xFFFF )
+
                 publishmsg!!.setPayload(mavpac.pack().encodePacket())
             }/////60
 
@@ -869,16 +870,15 @@ private val uiRunnable: Runnable = object : Runnable {
             mgatt!!.disconnect()
             mgatt!!.close()
             sleep(500)
-            mgatt = bluetoothDevice?.connectGatt(
+            mgatt = bluetoothDevice.connectGatt(
                 applicationContext,
                 false,
                 gattCallback
             )
-
         }
         else{
             findviewID1()
-            uihandle?.postDelayed(uiRunnable, 0)
+            uihandle.postDelayed(uiRunnable, 0)
         }
 
     }
@@ -1466,12 +1466,12 @@ private val uiRunnable: Runnable = object : Runnable {
         /////press to start up the pump or close
         if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
             if(!FLAG_CONTROL_PUMP){
-                var com = byteArrayOf(0x06)
+                var com = byteArrayOf(0x01.toByte())
                 mqttpublish(com, CMD_CONTROL_PUMP)
                 FLAG_CONTROL_PUMP = true
             }
             else{
-                var com = byteArrayOf(0x00)
+                var com = byteArrayOf(0x00.toByte())
                 mqttpublish(com, CMD_CONTROL_PUMP)
                 FLAG_CONTROL_PUMP = false
             }
