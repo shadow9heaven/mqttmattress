@@ -29,6 +29,7 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.w3c.dom.Text
 import java.lang.Exception
@@ -83,7 +84,7 @@ class bed_adjust : AppCompatActivity() {
 
     var FLAG_CLICK_BED = false /////click the bed button
     var FLAG_AUTO_TUNE = false //////for body tune function ?
-
+    var FLAG_MQTT_DISCONN = false //////for mqtt disconnect
     var FLAG_RELI_ONOFF = false ///////true when mode 2 on
     var FLAG_RELI_UPDOWN = false///////true when up, false when down
 
@@ -301,6 +302,9 @@ class bed_adjust : AppCompatActivity() {
 
             sleep(1000)
         }
+
+
+
     }
 
 ////////command thread
@@ -359,7 +363,23 @@ private val uiRunnable: Runnable = object : Runnable {
                     Log.e("uithread",e.message!!)
                 }
                 if(FLAG_MQTT_CONNECT)iv_bleicn.setImageResource(R.drawable.bt_on)
-                else iv_bleicn.setImageResource(R.drawable.bt_off)
+                else{
+
+                    if(!FLAG_MQTT_DISCONN){
+                        FLAG_MQTT_DISCONN = true
+                        iv_bleicn.setImageResource(R.drawable.bt_off)
+                        val builder = AlertDialog.Builder(this@bed_adjust)
+                        builder.setTitle("warn")
+                        builder.setIcon(R.mipmap.ic_launcher_round)
+                        builder.setMessage("mqtt broker disconnected")
+                        builder.setPositiveButton("OK"){dialogInterface, i -> dialogInterface.dismiss()
+
+                        }
+                        builder.create().show()
+                    }
+                }
+
+
             }
 
             else {
@@ -1325,7 +1345,6 @@ private val uiRunnable: Runnable = object : Runnable {
             current_back = set_lback
             current_weist = set_lweist
             current_butt = set_lbutt
-
 
             bed_lrb = 1
 
