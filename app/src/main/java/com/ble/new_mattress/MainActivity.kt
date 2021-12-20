@@ -37,7 +37,7 @@ var ble_cnt = false
 
 var wifi_mac = ""
 var bleaddress = ""
-var SavedBleAddr :String = ""
+var SavedBleAddr :String = "no add"
 
 var blefile : File? = null
 var storagePath : File? = null
@@ -503,8 +503,6 @@ class MainActivity : AppCompatActivity() {
             else{
 
             }
-
-
         }
         catch (e: Exception){
             Log.d("readble", e.message!!)
@@ -561,13 +559,18 @@ class MainActivity : AppCompatActivity() {
                             this,
                             Manifest.permission.ACCESS_FINE_LOCATION
                         )
+                        != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
                         != PackageManager.PERMISSION_GRANTED
                     ) {
                         ActivityCompat.requestPermissions(
                             this,
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),
                             18
                         )
+
                     }////ask fine location
                     else {
                         opentermsActivity()

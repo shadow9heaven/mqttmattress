@@ -156,6 +156,8 @@ class bed_adjust : AppCompatActivity() {
 
 
     lateinit var tv_medi_settime :TextView
+    lateinit var tv_appversion :TextView
+
     lateinit var ib_reli1 :ImageButton
     lateinit var ib_reli2 :ImageButton
     lateinit var ib_reli3 :ImageButton
@@ -378,7 +380,6 @@ private val uiRunnable: Runnable = object : Runnable {
                         builder.create().show()
                     }
                 }
-
 
             }
 
@@ -758,6 +759,8 @@ private val uiRunnable: Runnable = object : Runnable {
         wb_butt?.setEnabled(false)
 //////////
 
+        tv_appversion = findViewById(R.id.tv_appversion)
+        tv_appversion.text = BuildConfig.VERSION_NAME
 
         tv_pressure = findViewById(R.id.tv_pressure)
         tv_publish = findViewById(R.id.tv_publish)

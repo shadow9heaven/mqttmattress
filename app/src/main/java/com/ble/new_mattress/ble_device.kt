@@ -86,10 +86,8 @@ class ble_device : AppCompatActivity() {
         setList()
         val checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION)
             ) Toast.makeText(this, "didn't get permission", Toast.LENGTH_LONG).show()
 
         }
@@ -107,16 +105,12 @@ class ble_device : AppCompatActivity() {
                     refreshBtList()
                 }///////do sth when touch OK
                 builder.create().show()
-
             }
         }
-
-
     }
 
     fun GPSisOPen(context: Context): Boolean {
         val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
-
         val gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         val network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         return if (gps || network) {
