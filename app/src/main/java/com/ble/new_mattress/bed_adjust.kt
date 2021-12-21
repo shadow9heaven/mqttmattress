@@ -87,8 +87,10 @@ class bed_adjust : AppCompatActivity() {
     var FLAG_MQTT_DISCONN = false //////for mqtt disconnect
     var FLAG_RELI_ONOFF = false ///////true when mode 2 on
     var FLAG_RELI_UPDOWN = false///////true when up, false when down
+    var FLAG_MEDI_ON = false  /////true when mode 3 on
 
-    var FLAG_MEDI_ON = false  ///// true when mode 3 on
+    var FLAG_LOADING = false  /////true when loading
+
 
     //var FLAG_ACK_BACK = false //// true when ack back
 
@@ -255,7 +257,7 @@ class bed_adjust : AppCompatActivity() {
 
         while(FLAG_MQTT_CONNECT){
             if(queue_cmd.size>0){
-                if(queue_resend >3 && !FLAG_MATTRESS_ACK){
+                if(queue_resend >0 && !FLAG_MATTRESS_ACK){
                     /////need resend
                     val thistopic = topic1 + "/"  + topic2[0] + "/" + wifi_mac
 
@@ -263,22 +265,25 @@ class bed_adjust : AppCompatActivity() {
                     queue_retry++
                     queue_resend = 0
                 }////need resend
-                else if(FLAG_MATTRESS_ACK || queue_retry > 2){
+                else if(FLAG_MATTRESS_ACK || queue_retry > 3){
                     queue_cmd.poll()
-                    if(queue_retry >2){
-                        Log.d("cmd_queue","send falied")
+                    runOnUiThread {
+                        if(queue_retry >3){
+                            Log.d("cmd_queue","send falied")
+                            Toast.makeText(this, "訊息發送失敗", Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            Log.d("cmd_queue","send success")
+                            Toast.makeText(this, "訊息發送成功", Toast.LENGTH_LONG).show()
+                        }
+                        queue_resend = 0
+                        queue_retry = 0
+                        FLAG_MATTRESS_ACK = false
                     }
-                    else{
-                        Log.d("cmd_queue","send success")
-                    }
-                    queue_resend = 0
-                    queue_retry = 0
-                    FLAG_MATTRESS_ACK = false
                 }////send success or give up
                 else {
                     queue_resend++
                 }///wait ack fail
-
             }////if queue has sth
             else{}///do nothing when queue is empty
 
@@ -723,11 +728,23 @@ private val uiRunnable: Runnable = object : Runnable {
     }///////butt draggable
 
     fun findloadview(){
+        FLAG_LOADING = true
         setContentView(R.layout.loadingscreen)
+
+        Thread{
+            sleep(10000)
+            if(FLAG_LOADING){
+                runOnUiThread {
+                    findviewID1()
+                    uihandle?.postDelayed(uiRunnable, 0)
+                }
+            }
+        }.start()
+
     }
 
     fun findviewID1(){
-
+        FLAG_LOADING = false
         //////////////////////findviewbyid
         setContentView(R.layout.activity_bed_adjust)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -881,7 +898,6 @@ private val uiRunnable: Runnable = object : Runnable {
         findloadview()
         extFile = File(storagePath, "command.txt")
 
-
         try{
             if(bluetoothDevice != null) ble_cnt = true
         }
@@ -936,7 +952,6 @@ private val uiRunnable: Runnable = object : Runnable {
     }
 
     private val gattCallback = object : BluetoothGattCallback() {
-
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
@@ -946,7 +961,7 @@ private val uiRunnable: Runnable = object : Runnable {
             Log.e("onCharacteristicRead",characteristic!!.uuid.toString())
 
 
-            val data = characteristic!!.value
+            val data = characteristic.value
             when(characteristic.uuid.toString()){
                 VER_MAC_UUID->{
                     val ble_mac = byteArrayOf(data[4],data[5],data[6],data[7],data[8] ,data[9])
@@ -1269,9 +1284,11 @@ private val uiRunnable: Runnable = object : Runnable {
     fun clickreli6(view: View) {
         turn_relionoff(6)
     }
+
     /*
     * triggered when relieve minus button is pressed
     */
+
     fun clickreliminus(view: View) {
         if(reli_level>RELI_MIN){
 
