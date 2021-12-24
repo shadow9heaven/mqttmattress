@@ -176,6 +176,12 @@ class bed_adjust : AppCompatActivity() {
     var prev_weist = 5
     var prev_butt = 5
 
+    var prev_head = 5
+    var prev_neck = 5
+    var prev_shoulder = 5
+    var prev_back = 5
+
+
     val medi_level = 10.toByte()
 
     //////medi on off
@@ -1455,12 +1461,28 @@ private val uiRunnable: Runnable = object : Runnable {
             current_weist = prev_weist
             current_butt = prev_butt
 
+            current_head = prev_head
+            current_neck = prev_neck
+            current_shoulder = prev_shoulder
+            current_back = prev_back
+
 
             if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT) {
+
                 var com = byteArrayOf(bed_lrb.toByte(),pos_5,current_weist.toByte())
                 mqttpublish(com, CMD_ADJUST_HARDNESS)
                 var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,current_butt.toByte())
                 mqttpublish(com2, CMD_ADJUST_HARDNESS)
+
+                var com3 = byteArrayOf(bed_lrb.toByte(),pos_1,current_head.toByte())
+                mqttpublish(com3, CMD_ADJUST_HARDNESS)
+                var com4 = byteArrayOf(bed_lrb.toByte(),pos_2,current_neck.toByte())
+                mqttpublish(com4, CMD_ADJUST_HARDNESS)
+                var com5 = byteArrayOf(bed_lrb.toByte(),pos_3,current_shoulder.toByte())
+                mqttpublish(com5, CMD_ADJUST_HARDNESS)
+                var com6 = byteArrayOf(bed_lrb.toByte(),pos_4,current_back.toByte())
+                mqttpublish(com6, CMD_ADJUST_HARDNESS)
+
             }
 
         }// turn off
@@ -1469,10 +1491,24 @@ private val uiRunnable: Runnable = object : Runnable {
             ib_funmedi.setImageResource(R.drawable.medi_stop)
             iv_medistatus.alpha = 1f
             FLAG_MEDI_ON = true
+
+
             prev_weist = current_weist
             prev_butt = current_butt
-            current_weist = 10
-            current_butt = 10
+
+            prev_head = current_head
+            prev_neck = current_neck
+            prev_shoulder = current_shoulder
+            prev_back = current_back
+
+            current_weist = medi_level.toInt()
+            current_butt = medi_level.toInt()
+
+            current_head = 0
+            current_neck = 0
+            current_shoulder = 0
+            current_back = 0
+
 
             if(FLAG_MQTT_CONNECT && FLAG_WIFI_CONNECT){
 
@@ -1481,6 +1517,14 @@ private val uiRunnable: Runnable = object : Runnable {
                 var com2 = byteArrayOf(bed_lrb.toByte(),pos_6,medi_level)
                 mqttpublish(com2, CMD_ADJUST_HARDNESS)
 
+                var com3 = byteArrayOf(bed_lrb.toByte(),pos_1,0)
+                mqttpublish(com3, CMD_ADJUST_HARDNESS)
+                var com4 = byteArrayOf(bed_lrb.toByte(),pos_2,0)
+                mqttpublish(com4, CMD_ADJUST_HARDNESS)
+                var com5 = byteArrayOf(bed_lrb.toByte(),pos_3,0)
+                mqttpublish(com5, CMD_ADJUST_HARDNESS)
+                var com6 = byteArrayOf(bed_lrb.toByte(),pos_4,0)
+                mqttpublish(com6, CMD_ADJUST_HARDNESS)
             /*
                 val com = byteArrayOf(bed_lrb.toByte(),0x04.toByte(),0xFF.toByte())
                 mqttpublish(com,CMD_MEDITATION)
